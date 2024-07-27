@@ -3,9 +3,6 @@ import { error } from "@sveltejs/kit";
 import { uniqueId, hash } from "$lib/encryptUtil";
 import { insertPaste, initializeDatabase, getAllPastes } from "$lib/dataStore";
 
-await initializeDatabase();
-
-
 export const actions = {
   createPaste: async ({ request }) => {
     const formData = await request.formData();

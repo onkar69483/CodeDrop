@@ -1,41 +1,49 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { PrismaClient } from '@prisma/client';
 
-const dbPromise = open({
-  filename: './database.db',
-  driver: sqlite3.Database
-});
+const prisma = new PrismaClient();
 
-export async function initializeDatabase() {
-  const db = await dbPromise;
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS pastes (
-      id TEXT PRIMARY KEY,
-      text TEXT,
-      title TEXT,
-      password TEXT,
-      paste_expiration INTEGER,
-      encrypted INTEGER
-    )
-  `);
-}
+// No need for initializeDatabase function as Prisma with MongoDB doesn't require manual table creation
 
+// Function to insert a new paste
 export async function insertPaste(data) {
-  const db = await dbPromise;
-  const { id, text, title, password, paste_expiration, encrypted } = data;
-  await db.run(`
-    INSERT INTO pastes (id, text, title, password, paste_expiration, encrypted)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `, [id, text, title, password, paste_expiration, encrypted]);
+  const { text, title, password, paste_expiration, encrypted } = data;
+
+  // Insert the new paste into MongoDB
+  const newPaste = await prisma.paste.create({
+    data: {
+      text,
+      title,
+      password,
+      paste_expiration,
+      encrypted,
+    },
+  });
+
+  return newPaste;
 }
 
+// Function to get a paste by its ID
 export async function getPaste(id) {
-  const db = await dbPromise;
-  return db.get('SELECT * FROM pastes WHERE id = ?', [id]);
+  // Find the paste with the given ID
+  const paste = await prisma.paste.findUnique({
+    where: { id },
+  });
+
+  return paste;
 }
 
+// Function to get all non-expired pastes
 export async function getAllPastes() {
-  const db = await dbPromise;
-  const now = Date.now();
-  return db.all('SELECT * FROM pastes WHERE paste_expiration > ?', [now]);
+  const now = new Date().getTime();
+
+  // Find all pastes where paste_expiration is greater than the current time
+  const pastes = await prisma.paste.findMany({
+    where: {
+      paste_expiration: {
+        gt: now,
+      },
+    },
+  });
+
+  return pastes;
 }
