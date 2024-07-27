@@ -1,0 +1,33 @@
+# Node modules
+node_modules
+
+# SvelteKit build and cache
+/.svelte-kit
+/build
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Misc
+/.vercel
+/pnpm-lock.yaml
+/yarn.lock
+/.vscode
+
+# Firebase functions
+/firebase/*
+functions/package-lock.json
+functions/*
+ui-debug.log
+static/samples/*
