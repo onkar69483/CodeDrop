@@ -1,11 +1,17 @@
 <script>
+	
 	// @ts-nocheck
 	import { page } from '$app/stores';
 	import '../app.pcss';
 	// import HeaderBanner from './HeaderBanner.svelte';
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Button } from 'flowbite-svelte';
-	import { Footer, FooterCopyright, FooterLinkGroup, FooterLink } from 'flowbite-svelte';
+	// import { Footer, FooterCopyright, FooterLinkGroup, FooterLink } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
+	import Footer from './components/Footer.svelte';
+	import Hero from './components/Hero.svelte';
+	
+	
+	
 </script>
 
 <svelte:head>
@@ -19,7 +25,9 @@
 	<meta property="og:image" content="https://example.com/codedrop-thumbnail.jpg" />
 	<!-- Consider replacing "https://example.com/codedrop-thumbnail.jpg" with the actual URL of your project's thumbnail image -->
 </svelte:head>
-
+<Hero />
 <main class="bg-white dark:bg-gray-900" style="min-height: calc(100vh - 145px);">
 	<slot></slot>
 </main>
+
+<Footer />
