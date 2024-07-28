@@ -2,11 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import crypto from "crypto";
 import {
   getPaste,
-  initializeDatabase,
   deleteExpiredPastes,
 } from "$lib/dataStore";
-
-initializeDatabase(); // Ensure this runs once at startup
 
 const secretKey =
   "f464fdcbd76681b5b1e44ebfd2a5a4989ad4ab6db151bc10743e7147d34a3dff".slice(

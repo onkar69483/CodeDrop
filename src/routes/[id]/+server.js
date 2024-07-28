@@ -4,8 +4,8 @@ const prisma = new PrismaClient();
 
 export async function GET({ params }) {
   try {
-    const id = parseInt(params.id, 10);
-    const snippet = await prisma.snippet.findUnique({
+    const id = params.id
+    const snippet = await prisma.paste.findUnique({
       where: { id },
     });
 
