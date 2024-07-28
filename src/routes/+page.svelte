@@ -18,6 +18,7 @@
     import "prismjs/components/prism-javascript";
     import "prismjs/components/prism-css";
     import "prismjs/components/prism-markup";
+    import Hero from './components/Hero.svelte';
   
     import { Dropdown, DropdownItem } from "flowbite-svelte";
     import { javascript } from "svelte-highlight/languages";
@@ -113,7 +114,8 @@
     }
   </script>
 
-  <div class="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+  <Hero />
+  <div id="create-pastes" class="min-h-screen bg-gray-900 text-white flex items-center justify-center">
     <div class="max-w-4xl w-full">
       <div class="bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
         <h2 class="text-2xl font-bold mb-4">Create a New Paste</h2>
@@ -208,7 +210,7 @@
         </form>
       </div>
   
-      <div class="bg-gray-800 rounded-lg shadow-lg p-8">
+      <div id="recent-pastes" class="bg-gray-800 rounded-lg shadow-lg p-8">
         <h2 class="text-2xl font-bold mb-4">Recent Pastes</h2>
         {#if data.pastes && data.pastes.length > 0}
           <ul class="space-y-4">

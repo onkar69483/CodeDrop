@@ -8,7 +8,6 @@
 	import { DarkMode } from 'flowbite-svelte';
 	
 	import Footer from './components/Footer.svelte';
-	import Hero from './components/Hero.svelte';
 	import Header from './components/Header.svelte';
 </script>
 
@@ -27,7 +26,6 @@
 </svelte:head>
 
 <Header />
-<Hero />
 
 <main class="bg-white dark:bg-gray-900" style="min-height: calc(100vh - 145px);">
 	<slot></slot>
