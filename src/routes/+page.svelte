@@ -209,7 +209,6 @@
       </div>
   
       <div class="bg-gray-800 rounded-lg shadow-lg p-8">
-        <img src="path_to_your_logo.png" alt="Logo" class="w-16 h-16 mx-auto mb-4" />
         <h2 class="text-2xl font-bold mb-4">Recent Pastes</h2>
         {#if data.pastes && data.pastes.length > 0}
           <ul class="space-y-4">
