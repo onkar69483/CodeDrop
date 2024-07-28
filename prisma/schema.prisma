@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -14,7 +14,17 @@ generator client {
 }
 
 model Snippet {
-  id        Int      @id @default(autoincrement())
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
   code      String
   createdAt DateTime @default(now())
+}
+
+model Paste {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  text           String
+  title          String
+  password       String?
+  paste_expiration Int?
+  encrypted      Int?
+  createdAt      DateTime @default(now())
 }
