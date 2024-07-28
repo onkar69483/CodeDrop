@@ -6,6 +6,7 @@
   import ClipboardJS from "clipboard";
   import toast, { Toaster } from "svelte-french-toast";
   import { jsPDF } from "jspdf";
+  import { DarkMode } from 'flowbite-svelte';
   let id = null;
   let paste = null;
   let code = null;
@@ -67,6 +68,7 @@
     }
   }
 </script>
+
 
 <svelte:head>
   {@html atomOneDark}
@@ -150,7 +152,15 @@
 {:else}
   <div class="container mx-auto my-8">
     <div class="bg-white rounded-lg shadow-md p-6">
-      <p>Paste not found or expired.</p>
+      <button type="button" class="bg-indigo-500 text-white rounded px-4 py-2 flex items-center" disabled>
+        <svg class="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        Processing...
+      </button>
     </div>
   </div>
 {/if}
+
+
