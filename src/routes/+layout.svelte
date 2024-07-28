@@ -4,8 +4,11 @@
 	import '../app.pcss';
 	// import HeaderBanner from './HeaderBanner.svelte';
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Button } from 'flowbite-svelte';
-	import { Footer, FooterCopyright, FooterLinkGroup, FooterLink } from 'flowbite-svelte';
+	// import { Footer, FooterCopyright, FooterLinkGroup, FooterLink } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
+	
+	import Footer from './components/Footer.svelte';
+	import Hero from './components/Hero.svelte';
 	import Header from './components/Header.svelte';
 </script>
 
@@ -23,9 +26,11 @@
 	<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 </svelte:head>
 
-<Header/>
+<Header />
+<Hero />
 
 <main class="bg-white dark:bg-gray-900" style="min-height: calc(100vh - 145px);">
 	<slot></slot>
 </main>
 
+<Footer />
