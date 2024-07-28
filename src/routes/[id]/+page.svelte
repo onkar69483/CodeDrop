@@ -57,7 +57,7 @@
         await navigator.share({
           title: "Check this out!",
           text: "I found this interesting link:",
-          url: `/pastebin/${id}`,
+          url: `/${id}`,
         });
         console.log("Link shared successfully");
       } catch (error) {
