@@ -2,6 +2,32 @@
 
 **CodeDrop** allows you to easily paste and share code snippets with others. Set expiration times for automatic deletion and ensure secure, temporary sharing. Perfect for quick collaborations and ephemeral exchanges.
 
+## 🌐 Live Demo
+
+Visit the live demo of CodeDrop hosted on Vercel: https://codedrop.vercel.app
+
+## ✨ Features
+
+- **Paste and Share:** Quickly paste and share code snippets with a simple interface.
+- **Expiration Times:** Set custom expiration times for snippets, ensuring temporary sharing.
+- **Syntax Highlighting:** Automatic syntax highlighting for improved readability.
+- **Responsive Design:** A modern, user-friendly interface adaptable to any device.
+- **Share Options:** Easily share snippets with others through a generated link.
+- **Download Snippets:** Option to download snippets as a PDF for offline access.
+- **Clipboard Copy:** Copy code snippets directly to your clipboard for quick use.
+
+## 🛠️ Tech Stack
+
+- **Frontend:** SvelteKit
+- **Backend:** Node.js, Express
+- **Database:** MongoDB (using MongoDB+srv for scalability)
+- **ORM:** Prisma
+- **Deployment:** Vercel
+- **Syntax Highlighting:** svelte-highlight
+- **PDF Generation:** jsPDF library
+- **Clipboard Copy:** clipboard.js
+- **Styling:** Tailwind CSS for responsive design
+
 ## 🚀 Getting Started
 
 Follow these instructions to set up CodeDrop on your local machine.
