@@ -6,7 +6,7 @@
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Button } from 'flowbite-svelte';
 	import { Footer, FooterCopyright, FooterLinkGroup, FooterLink } from 'flowbite-svelte';
 	import { DarkMode } from 'flowbite-svelte';
-	import Header from './components/header.svelte';
+	import Header from './components/Header.svelte';
 </script>
 
 <svelte:head>
