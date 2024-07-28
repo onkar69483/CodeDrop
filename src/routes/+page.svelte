@@ -100,7 +100,7 @@
   <div class="max-w-4xl w-full">
   
 
-    <div class="bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
+    <div id="create-pastes" class="bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
       <h2 class="text-2xl font-bold mb-4">Create a New Paste</h2>
       <form method="POST" action="?/createPaste" class="space-y-4">
         <div>
@@ -198,7 +198,7 @@
 
 
     
-    <div class="bg-gray-800 rounded-lg shadow-lg p-8">
+    <div id="recent-pastes" class="bg-gray-800 rounded-lg shadow-lg p-8">
       <h2 class="text-2xl font-bold mb-4">Recent Pastes</h2>
       {#if data.pastes && data.pastes.length > 0}
         <ul class="space-y-4">
