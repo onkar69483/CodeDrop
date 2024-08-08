@@ -41,7 +41,7 @@
 		content="CodeDrop allows you to easily paste and share code snippets with others. Set expiration times for automatic deletion and ensure secure, temporary sharing. Perfect for quick collaborations and ephemeral exchanges."
 	/>
 	<meta name="keywords" content="CodeDrop, code sharing, code snippets, paste code, share code, temporary code sharing, secure code sharing, quick collaborations" />
-	<meta property="og:image" content="https://github.com/onkar69483/CodeDrop/tree/main/static/thumbnail.png" />
+	<meta property="og:image" content="https://raw.githubusercontent.com/onkar69483/CodeDrop/main/static/thumbnail.png" />
 	<!-- Consider replacing "https://example.com/codedrop-thumbnail.jpg" with the actual URL of your project's thumbnail image -->
     <!-- Importing Google Fonts -->
 	<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
