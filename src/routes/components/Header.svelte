@@ -21,8 +21,8 @@
 
 		<!-- Desktop Menu -->
 		<nav class="hidden lg:flex lg:items-center lg:space-x-6">
-			<a href="#create-pastes" class="text-md text-gray-200 hover:text-indigo-400 transition duration-300 ease-in-out">Create Pastes</a>
-			<a href="#recent-pastes" class="text-md text-gray-200 hover:text-red-400 transition duration-300 ease-in-out">Recent Pastes</a>
+			<a href="/#create-pastes" class="text-md text-gray-200 hover:text-indigo-400 transition duration-300 ease-in-out">Create Pastes</a>
+			<a href="/#recent-pastes" class="text-md text-gray-200 hover:text-red-400 transition duration-300 ease-in-out">Recent Pastes</a>
 		</nav>
 
 		<!-- Mobile Menu Overlay -->
@@ -35,8 +35,8 @@
 					</svg>
 				</button>
 				<nav class="flex flex-col space-y-4">
-					<a href="#create-pastes" class="text-md text-gray-200 hover:text-indigo-400 transition duration-300 ease-in-out" on:click={toggleMenu}>Create Pastes</a>
-					<a href="#recent-pastes" class="text-md text-gray-200 hover:text-red-400 transition duration-300 ease-in-out" on:click={toggleMenu}>Recent Pastes</a>
+					<a href="/#create-pastes" class="text-md text-gray-200 hover:text-indigo-400 transition duration-300 ease-in-out" on:click={toggleMenu}>Create Pastes</a>
+					<a href="/#recent-pastes" class="text-md text-gray-200 hover:text-red-400 transition duration-300 ease-in-out" on:click={toggleMenu}>Recent Pastes</a>
 				</nav>
 			</div>
 		</div>
