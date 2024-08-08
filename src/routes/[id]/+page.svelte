@@ -6,7 +6,6 @@
   import ClipboardJS from "clipboard";
   import toast, { Toaster } from "svelte-french-toast";
   import { jsPDF } from "jspdf";
-  import { DarkMode } from 'flowbite-svelte';
   let id = null;
   let paste = null;
   let code = null;
@@ -162,5 +161,3 @@
     </div>
   </div>
 {/if}
-
-
