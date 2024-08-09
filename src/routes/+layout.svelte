@@ -53,6 +53,7 @@
   <!-- Meta tags for google and bing se verification -->
   <meta name="msvalidate.01" content="F08D096601151AB3C3750560588DF846" />
   <meta name="google-site-verification" content="NMPuB4hQ0zdn4BHUE1VCLXUghfnICKisubXfYqcqR3U" />
+  <meta name="google-site-verification" content="mWv4cDb2ZnB3SzBkAkn2lhTRwLEEvQrIAJkPjOyFmwQ" />
   <!-- Importing Google Fonts -->
 	<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 </svelte:head>
