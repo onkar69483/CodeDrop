@@ -50,7 +50,10 @@
 	<meta name="keywords" content="CodeDrop, code sharing, code snippets, paste code, share code, temporary code sharing, secure code sharing, quick collaborations" />
 	<meta property="og:image" content="https://raw.githubusercontent.com/onkar69483/CodeDrop/main/static/thumbnail.png" />
 	<!-- Consider replacing "https://example.com/codedrop-thumbnail.jpg" with the actual URL of your project's thumbnail image -->
-    <!-- Importing Google Fonts -->
+  <!-- Meta tags for google and bing se verification -->
+  <meta name="msvalidate.01" content="F08D096601151AB3C3750560588DF846" />
+  <meta name="google-site-verification" content="NMPuB4hQ0zdn4BHUE1VCLXUghfnICKisubXfYqcqR3U" />
+  <!-- Importing Google Fonts -->
 	<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 </svelte:head>
 
