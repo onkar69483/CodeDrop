@@ -2,6 +2,8 @@
 
 **CodeDrop** allows you to easily paste and share code snippets with others. Set expiration times for automatic deletion and ensure secure, temporary sharing. Perfect for quick collaborations and ephemeral exchanges.
 
+![image](https://github.com/user-attachments/assets/48e2d3ad-4e12-4467-a5b8-9c472c367f91)
+
 ## 🌐 Live Demo
 
 Visit the live demo of CodeDrop hosted on Vercel: https://codedrop.vercel.app
