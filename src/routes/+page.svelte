@@ -336,7 +336,7 @@
     </div>
 
     <!-- Recent Pastes Section -->
-    <div class="bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700">
+    <div id="recent-pastes" class="bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700">
       <h2 class="text-3xl font-bold mb-6 flex items-center">
         <span class="mr-3">📚</span> Recent Pastes
       </h2>
