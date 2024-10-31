@@ -25,7 +25,7 @@
         throw new Error("Invalid or non-existent paste ID.");
       }
       const data = await res.json();
-      paste = data;
+      paste = data.id;
       code = paste.text;
       new ClipboardJS(".btn-clip");
     } catch (error) {
