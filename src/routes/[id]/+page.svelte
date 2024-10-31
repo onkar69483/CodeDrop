@@ -6,6 +6,7 @@
   import ClipboardJS from "clipboard";
   import toast, { Toaster } from "svelte-french-toast";
   import { jsPDF } from "jspdf";
+  import { goto } from "$app/navigation"; // Importing goto for navigation
 
   let id = null;
   let paste = null;
@@ -14,11 +15,12 @@
   const doc = new jsPDF();
 
   onMount(async () => {
-    id = $page.params.id;
-    console.log(`fetching /api/paste/${id}`);
+    id = $page.params.id; // Get the ID from the URL parameters
+    console.log(`fetching /api?id=${id}`);
 
     try {
-      const res = await fetch(`/api/paste/${id}`);
+      // Fetching the paste using the updated route
+      const res = await fetch(`/api?id=${id}`);
       if (!res.ok) {
         throw new Error("Invalid or non-existent paste ID.");
       }
@@ -33,6 +35,7 @@
     }
   });
 
+  // Function to format expiration time
   function formatExpirationTime(expirationTimestamp) {
     const secondsRemaining = Math.floor(
       (expirationTimestamp - Date.now()) / 1000
@@ -51,13 +54,14 @@
     }
   }
 
+  // Function to share the link
   async function shareLink() {
     if (navigator.share) {
       try {
         await navigator.share({
           title: "Check this out!",
           text: "I found this interesting link:",
-          url: `/paste/${id}`,
+          url: `/${id}`,
         });
         console.log("Link shared successfully");
       } catch (error) {
@@ -96,7 +100,7 @@
       <p class="text-md mb-4">{errorMessage}</p>
       <div class="flex justify-end">
         <button
-          on:click={() => (errorMessage = "")}
+          on:click={() => goto("/")}
           class="bg-red-700 hover:bg-red-600 text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
         >
           Go Back
