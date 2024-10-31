@@ -49,7 +49,7 @@
               on:click={scrollToCreate}
               class="px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white flex items-center justify-center transition-all duration-200"
           >
-              Get Started Free
+              Get Started 
               <ChevronRight class="ml-2 w-4 h-4" />
           </button>
           
