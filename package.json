@@ -42,6 +42,7 @@
 		"express": "^4.19.2",
 		"install": "^0.13.0",
 		"jspdf": "^2.5.1",
+		"lucide-svelte": "^0.454.0",
 		"node-schedule": "^2.1.1",
 		"pdf-lib": "^1.17.1",
 		"prisma": "^5.16.1",
