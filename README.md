@@ -43,20 +43,36 @@ Ensure you have the following installed:
 
 ### 🛠️ Installation
 
-1. **Clone the Repository:**
+1. **Fork and Clone the Repository:**
 
    ```bash
    git clone https://github.com/your-username/codedrop.git
    cd codedrop
    ```
 
-2. **Install Dependencies:**
+2. **Create a MongoDB Atlas Cluster:**
+
+   Instead of a local MongoDB setup, we’ll use a MongoDB Atlas cluster for scalability and ease of use.
+
+   - **Create a MongoDB Atlas Account:** If you don't have an account, sign up at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+   - **Set Up a New Cluster:** Follow the steps in the [MongoDB Atlas documentation](https://www.mongodb.com/docs/atlas/getting-started/) to create your new cluster.
+   - **Get Your Connection URL:** Once the cluster is ready, go to the "Database" section in Atlas, click "Connect," and select "Connect your application." Copy the connection string.
+
+   Update your `.env` file with the following, replacing `<username>`, `<password>`, and `<cluster-url>` with your details:
+
+   ```env
+   DATABASE_URL="mongodb+srv://<username>:<password>@<cluster-url>/your-database-name?retryWrites=true&w=majority"
+   ```
+
+   This will connect your app to the MongoDB Atlas cluster.
+
+3. **Install Dependencies:**
 
    ```bash
    npm install
    ```
 
-3. **Run the Development Server:**
+4. **Run the Development Server:**
 
    ```bash
    npm run dev
