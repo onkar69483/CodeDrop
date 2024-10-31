@@ -139,13 +139,39 @@
             }}
             class="btn-clip bg-blue-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 mt-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            Download PDF
+            <svg
+              class="h-5 w-5 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
           </button>
           <button
             on:click={shareLink}
             class="btn-clip bg-blue-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 mt-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            Share Link
+            <svg
+              class="h-5 w-5 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
           </button>
         </div>
       </div>
