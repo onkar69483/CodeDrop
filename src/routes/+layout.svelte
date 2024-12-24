@@ -29,6 +29,10 @@
 			{
 				name: "Atharva Sawant",
 				githubId: "atharvasawant09"
+			},
+			{
+				name: "Aryan Bachute",
+				githubId: "Aryanfour5"
 			}
 		]
 	};
