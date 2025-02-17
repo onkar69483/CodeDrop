@@ -1,387 +1,379 @@
 <script lang="ts">
-  export let data: { pastes: any[] };
-  import Prism from "prismjs";
-  import "prismjs/themes/prism-tomorrow.css";
-  import "prismjs/components/prism-javascript";
-  import "prismjs/components/prism-css";
-  import "prismjs/components/prism-markup";
-  import "prismjs/components/prism-typescript";
-  import "prismjs/components/prism-python";
-  import "prismjs/components/prism-java";
-  import toast, { Toaster } from "svelte-french-toast";
-  import Hero from "./components/Hero.svelte";
-  import { fade, slide } from "svelte/transition";
-  import { quintOut } from "svelte/easing";
+  import { onMount } from 'svelte';
+  import { fade, fly, scale, blur } from 'svelte/transition';
+  import { elasticOut, cubicOut, backOut } from 'svelte/easing';
+  import { spring } from 'svelte/motion';
+  import { 
+    Rocket, 
+    Shield, 
+    Zap, 
+    Palette, 
+    Layout, 
+    Loader, 
+    Bell,
+    Github,
+    Twitter,
+    Mail
+  } from 'lucide-svelte';
 
-  let selectedLanguage = "markup";
-  let isDragging = false;
-  let showSuccessToast = false;
-  let toastMessage = "";
-  let toastType = "success"; // 'success' or 'error'
-  let currentTab = "editor"; // 'editor' or 'preview'
+  let mounted = false;
+  let progress = 0;
+  let mouseX = 0;
+  let mouseY = 0;
 
-  const languageOptions = [
-    { value: "plaintext", label: "Plain Text", icon: "📝" },
-    { value: "css", label: "CSS", icon: "🎨" },
-    { value: "markup", label: "HTML", icon: "🌐" },
-    { value: "javascript", label: "JavaScript", icon: "⚡" },
-    { value: "typescript", label: "TypeScript", icon: "📘" },
-    { value: "python", label: "Python", icon: "🐍" },
-    { value: "java", label: "Java", icon: "☕" },
+  // Parallax effect with enhanced sensitivity
+  function handleMouseMove(event: MouseEvent) {
+    mouseX = (event.clientX / window.innerWidth - 0.5) * 30;
+    mouseY = (event.clientY / window.innerHeight - 0.5) * 30;
+  }
+
+  onMount(() => {
+    mounted = true;
+    
+    // Progress animation
+    const interval = setInterval(() => {
+      progress = (progress + 1) % 100;
+    }, 50);
+
+    // Particle system
+    initializeParticles();
+    
+    return () => clearInterval(interval);
+  });
+
+  function initializeParticles() {
+    const canvas = document.getElementById('particle-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const particles: Particle[] = [];
+    
+    // Create particles
+    for (let i = 0; i < 150; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2 + 0.5,
+        color: `rgba(${Math.floor(Math.random() * 100 + 155)}, ${Math.floor(Math.random() * 100 + 155)}, 255, ${Math.random() * 0.5 + 0.2})`,
+        vx: Math.random() * 0.5 - 0.25,
+        vy: Math.random() * 0.5 - 0.25
+      });
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(particle => {
+        // Update position
+        particle.x += particle.vx + mouseX * 0.005;
+        particle.y += particle.vy + mouseY * 0.005;
+        
+        // Boundary checking
+        if (particle.x < 0) particle.x = canvas.width;
+        if (particle.y < 0) particle.y = canvas.height;
+        if (particle.x > canvas.width) particle.x = 0;
+        if (particle.y > canvas.height) particle.y = 0;
+        
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color;
+        ctx.fill();
+      });
+    }
+    
+    animate();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  }
+
+  interface Particle {
+    x: number;
+    y: number;
+    radius: number;
+    color: string;
+    vx: number;
+    vy: number;
+  }
+
+  const features = [
+    { icon: Rocket, title: "Lightning Fast", description: "Optimized for maximum performance" },
+    { icon: Shield, title: "Enhanced Security", description: "State-of-the-art protection" },
+    { icon: Zap, title: "Real-time Updates", description: "Instant synchronization" },
+    { icon: Palette, title: "Modern Design", description: "Beautiful user interface" },
+    { icon: Layout, title: "Responsive UI", description: "Perfect on all devices" },
+    { icon: Loader, title: "Auto-scaling", description: "Handles any workload" }
   ];
-
-  function formatExpirationTime(expirationTimestamp: number | null): string {
-    if (expirationTimestamp === null) return "Never";
-
-    const now = Date.now();
-    const secondsRemaining = Math.floor((expirationTimestamp - now) / 1000);
-
-    if (secondsRemaining <= 0) return "Expired";
-    if (secondsRemaining < 60) return `${secondsRemaining}s`;
-    if (secondsRemaining < 3600) return `${Math.floor(secondsRemaining / 60)}m`;
-    if (secondsRemaining < 86400)
-      return `${Math.floor(secondsRemaining / 3600)}h`;
-    return `${Math.floor(secondsRemaining / 86400)}d`;
-  }
-
-  function showToast(message: string, type: 'success' | 'error' = 'success') {
-      toastMessage = message;
-      toastType = type;
-      showSuccessToast = true;
-      setTimeout(() => {
-          showSuccessToast = false;
-          toastMessage = '';
-      }, 3000);
-  }
-
-  function handleDragEnter(e: DragEvent) {
-    e.preventDefault();
-    isDragging = true;
-  }
-
-  function handleDragLeave(e: DragEvent) {
-    e.preventDefault();
-    isDragging = false;
-  }
-
-  function handleDrop(e: DragEvent) {
-    e.preventDefault();
-    isDragging = false;
-    const files = e.dataTransfer?.files;
-    if (files && files[0]) handleFile(files[0]);
-  }
-
-  function handleFile(file: File) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const textArea = document.getElementById("text") as HTMLTextAreaElement;
-      textArea.value = e.target?.result?.toString() || "";
-      highlightSyntax();
-      showToast("File uploaded successfully!");
-    };
-    reader.readAsText(file);
-  }
-
-  function handleFileSelection(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      handleFile(input.files[0]);
-    }
-  }
-
-  function clearFields() {
-    const titleInput = document.getElementById("title") as HTMLInputElement;
-    const textArea = document.getElementById("text") as HTMLTextAreaElement;
-    const fileInput = document.getElementById("file") as HTMLInputElement;
-    const pasteExpirationSelect = document.getElementById(
-      "paste_expiration"
-    ) as HTMLSelectElement;
-
-    titleInput.value = "";
-    textArea.value = "";
-    fileInput.value = "";
-    pasteExpirationSelect.value = "1 minute";
-    currentTab = "editor";
-    showToast("All fields cleared");
-  }
-
-  function highlightSyntax() {
-    currentTab = "preview";
-    const textArea = document.getElementById("text") as HTMLTextAreaElement;
-    const codeBlock = document.getElementById("code-preview") as HTMLElement;
-
-    if (textArea.value.trim()) {
-      codeBlock.innerHTML = `<pre class="language-${selectedLanguage}"><code>${Prism.highlight(
-        textArea.value,
-        Prism.languages[selectedLanguage],
-        selectedLanguage
-      )}</code></pre>`;
-    }
-  }
-
-  function handleLanguageChange(event) {
-    selectedLanguage = event.target.value;
-    if (currentTab === "preview") highlightSyntax();
-  }
-
-  async function sharePaste(paste) {
-    try {
-      await navigator.clipboard.writeText(
-        window.location.origin + `/${paste.id}`
-      );
-      showToast("Link copied to clipboard!");
-    } catch (err) {
-      console.error("Failed to copy:", err);
-      showToast("Failed to copy link", "error");
-    }
-  }
-
-  async function shareLink(pasteId: string) {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Check out this paste!",
-          text: "I found this interesting paste:",
-          url: `${window.location.origin}/${pasteId}`,
-        });
-        showToast("Link shared successfully!");
-      } catch (error) {
-        console.error("Error sharing:", error);
-        showToast("Failed to share link", "error");
-      }
-    } else {
-      showToast("Web Share API is not supported in your browser", "error");
-    }
-  }
 </script>
 
-<Hero />
+<svelte:head>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</svelte:head>
 
-{#if showSuccessToast}
-    <div transition:slide={{ duration: 300, axis: 'x' }} 
-         class="fixed top-1/2 -translate-y-1/2 right-4 px-6 py-3 rounded-lg shadow-xl z-[9999] flex items-center gap-2 {toastType === 'success' ? 'bg-green-500/90 backdrop-blur-sm' : 'bg-red-500/90 backdrop-blur-sm'} text-white">
-        <span class="text-xl">
-            {#if toastType === 'success'}
-                ✓
-            {:else}
-                ✕
-            {/if}
-        </span>
-        <p class="font-medium">{toastMessage}</p>
-    </div>
-{/if}
+<svelte:window on:mousemove={handleMouseMove} />
 
-<div
-  id="create-pastes" class="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white px-4 py-8 md:px-6"
->
-  <div class="max-w-5xl mx-auto">
-    <!-- Create Paste Section -->
-    <div
-      class="bg-gray-800 rounded-xl shadow-2xl p-6 mb-8 border border-gray-700"
-    >
-      <h2 class="text-3xl font-bold mb-6 flex items-center">
-        <span class="mr-3">📋</span> Create a New Paste
-      </h2>
+<div class="relative min-h-screen bg-gray-900 text-white overflow-hidden font-space-grotesk">
+  <!-- Animated background -->
+  <div class="absolute inset-0 overflow-hidden">
+    <!-- Base gradient background -->
+    <div class="absolute inset-0 bg-gradient-to-b from-blue-900/10 via-purple-900/10 to-indigo-900/10"></div>
+    
+    <!-- Interactive gradient overlay -->
+    <div 
+      class="absolute inset-0 opacity-40 transition-all duration-700 ease-in-out"
+      style="background: radial-gradient(circle at {50 + mouseX/2}% {50 + mouseY/2}%, rgba(56, 189, 248, 0.4) 0%, rgba(59, 130, 246, 0.35) 20%, rgba(147, 51, 234, 0.3) 40%, rgba(79, 70, 229, 0.25) 60%, transparent 100%)"
+    ></div>
+    
+    <!-- Particle canvas -->
+    <canvas id="particle-canvas" class="absolute inset-0 opacity-70"></canvas>
+    
+    <!-- Animated mesh pattern -->
+    <div class="absolute inset-0 bg-[url('/mesh-pattern.svg')] bg-repeat opacity-5"></div>
+    
+    <!-- Glow effects -->
+    <div 
+      class="absolute w-[800px] h-[800px] rounded-full bg-blue-500/20 blur-[120px] animate-glow-slow"
+      style="left: {30 + mouseX/3}%; top: {20 + mouseY/3}%"
+    ></div>
+    <div 
+      class="absolute w-[600px] h-[600px] rounded-full bg-purple-500/20 blur-[100px] animate-glow-medium"
+      style="right: {25 + mouseX/4}%; bottom: {30 + mouseY/4}%"
+    ></div>
+  </div>
 
-      <form method="POST" action="?/createPaste" class="space-y-6">
-        <!-- Title Input -->
-        <div>
-          <label for="title" class="block text-lg font-medium mb-2">
-            Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            required
-            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
-            placeholder="Enter a descriptive title..."
-          />
-        </div>
-
-        <!-- Language Selector -->
-        <div>
-          <label class="block text-lg font-medium mb-2"> Language </label>
-          <select
-            bind:value={selectedLanguage}
-            on:change={handleLanguageChange}
-            class="w-full md:w-1/3 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
-          >
-            {#each languageOptions as option}
-              <option value={option.value}>
-                {option.icon}
-                {option.label}
-              </option>
-            {/each}
-          </select>
-        </div>
-
-        <!-- File Drop Zone -->
-        <div
-          class="relative"
-          on:dragenter={handleDragEnter}
-          on:dragleave={handleDragLeave}
-          on:dragover|preventDefault
-          on:drop={handleDrop}
+  <!-- Main content -->
+  <div class="relative z-10 container mx-auto px-4 py-24 lg:py-32">
+    <div class="min-h-screen flex flex-col items-center justify-center">
+      {#if mounted}
+        <!-- Hero section -->
+        <div 
+          in:fly={{ y: -50, duration: 1200, delay: 200, easing: elasticOut }} 
+          class="text-center mb-16"
         >
-          <input
-            type="file"
-            id="file"
-            name="file"
-            on:change={handleFileSelection}
-            class="hidden"
-            accept=".txt,.css,.html,.js,.ts,.py,.java"
-          />
-          <label
-            for="file"
-            class="block p-8 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors text-center"
-          >
-            <div class="text-4xl mb-2">📂</div>
-            <span class="text-lg">Drop files here or click to upload</span>
-          </label>
-          {#if isDragging}
-            <div
-              class="absolute inset-0 bg-blue-500 bg-opacity-10 rounded-lg border-2 border-blue-500 pointer-events-none"
-            ></div>
-          {/if}
+          <div class="inline-block p-5 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-md mb-8 animate-float shadow-lg shadow-blue-500/10">
+            <Rocket size={48} class="text-blue-400"/>
+          </div>
+          
+          <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 tracking-tight animate-gradient">
+            Something Amazing<br/>Is Coming Soon
+          </h1>
+          
+          <p class="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            We're crafting a revolutionary new experience that will change 
+            the way you interact with our platform.
+          </p>
         </div>
 
-        <!-- Editor Tabs -->
-        <div class="border border-gray-700 rounded-lg overflow-hidden">
-          <div class="flex bg-gray-900 px-4 py-2 gap-4">
-            <button
-              type="button"
-              class="px-4 py-2 rounded-lg transition-colors {currentTab ===
-              'editor'
-                ? 'bg-blue-500 text-white'
-                : 'text-gray-400 hover:text-white'}"
-              on:click={() => (currentTab = "editor")}
-            >
-              ✏️ Editor
-            </button>
-            <button
-              type="button"
-              class="px-4 py-2 rounded-lg transition-colors {currentTab ===
-              'preview'
-                ? 'bg-blue-500 text-white'
-                : 'text-gray-400 hover:text-white'}"
-              on:click={highlightSyntax}
-            >
-              👁️ Preview
-            </button>
-          </div>
-
-          <div class="relative">
-            <textarea
-              id="text"
-              name="text"
-              rows="10"
-              required
-              class="w-full bg-gray-900 p-4 focus:outline-none font-mono {currentTab ===
-              'editor'
-                ? 'block'
-                : 'hidden'}"
-              placeholder="Enter or paste your code here..."
-            ></textarea>
+        <!-- Progress indicator -->
+        <div 
+          in:scale={{ duration: 1000, delay: 400 }}
+          class="w-full max-w-md mx-auto mb-20"
+        >
+          <div class="relative h-3 bg-gray-800/60 rounded-full overflow-hidden backdrop-blur-sm shadow-inner">
             <div
-              id="code-preview"
-              class="w-full bg-gray-900 p-4 max-h-[500px] overflow-auto {currentTab ===
-              'preview'
-                ? 'block'
-                : 'hidden'}"
+              class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-pulse-subtle"
+              style="width: {progress}%; transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);"
             ></div>
+          </div>
+          <div class="mt-4 text-center text-gray-400 font-medium tracking-wide">
+            <span class="font-semibold text-blue-400">{progress}%</span> Complete
           </div>
         </div>
 
-        <!-- Expiration Selector -->
-        <div>
-          <label for="paste_expiration" class="block text-lg font-medium mb-2">
-            Expiration Time
-          </label>
-          <select
-            id="paste_expiration"
-            name="paste_expiration"
-            class="w-full md:w-1/3 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
-          >
-            <option value="1 minute">⏱️ 1 Minute</option>
-            <option value="5 minutes">⏱️ 5 Minutes</option>
-            <option value="10 minutes">⏱️ 10 Minutes</option>
-            <option value="1 hour">⏱️ 1 Hour</option>
-            <option value="1 day">📅 1 Day</option>
-            <option value="1 week">📅 1 Week</option>
-            <option value="1 month">📅 1 Month</option>
-            <option value="2 months">📅 2 Months</option>
-            <option value="6 months">📅 6 Months</option>
-            <option value="12 months">📅 12 Months</option>
-          </select>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex flex-col md:flex-row gap-4">
-          <button
-            type="submit"
-            class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all transform hover:scale-105"
-          >
-            💾 Save Paste
-          </button>
-          <button
-            type="button"
-            on:click={clearFields}
-            class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium rounded-lg transition-all transform hover:scale-105"
-          >
-            🗑️ Clear All
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Recent Pastes Section -->
-    <div id="recent-pastes" class="bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700">
-      <h2 class="text-3xl font-bold mb-6 flex items-center">
-        <span class="mr-3">📚</span> Recent Pastes
-      </h2>
-
-      {#if data.pastes && data.pastes.length > 0}
-        <div class="grid gap-4">
-          {#each data.pastes as paste}
+        <!-- Features grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-20 max-w-6xl mx-auto">
+          {#each features as feature, i}
             <div
-              class="bg-gray-900 rounded-lg p-6 border border-gray-700 hover:border-blue-500 transition-all"
-              transition:slide={{ duration: 300, easing: quintOut }}
+              in:fly={{ y: 50, duration: 1000, delay: 600 + (i * 100), easing: backOut }}
+              class="group p-6 rounded-2xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-lg border border-gray-700/50 hover:border-blue-500/50 transition-all duration-500 transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10"
             >
-              <div class="flex justify-between items-start mb-4">
-                <h3 class="text-xl font-bold">{paste.title}</h3>
-                <span class="bg-gray-700 px-3 py-1 rounded-full text-sm">
-                  ⏳ {formatExpirationTime(paste.paste_expiration)}
-                </span>
+              <div class="mb-5 p-3 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 w-fit group-hover:bg-gradient-to-br group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-3">
+                <svelte:component this={feature.icon} size={28} class="text-blue-400 group-hover:text-blue-300 transition-colors"/>
               </div>
-
-              <p class="mb-4 text-gray-300 line-clamp-3 font-mono text-sm">
-                {paste.text}
-              </p>
-
-              <div class="flex gap-3">
-                <a
-                  href={`/${paste.id}`}
-                  class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
-                >
-                  👁️ View
-                </a>
-                <button
-                  on:click={() => shareLink(paste.id)}
-                  class="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-                >
-                  📤 Share
-                </button>
-              </div>
+              <h3 class="text-xl font-semibold mb-3 group-hover:text-blue-300 transition-colors">{feature.title}</h3>
+              <p class="text-gray-400 group-hover:text-gray-300 transition-colors">{feature.description}</p>
             </div>
           {/each}
         </div>
-      {:else}
-        <div class="text-center py-8 text-gray-400">
-          <div class="text-4xl mb-4">📭</div>
-          <p>No pastes found. Create your first paste above!</p>
+
+        <!-- Newsletter -->
+        <div 
+          in:fly={{ y: 50, duration: 1000, delay: 1200, easing: cubicOut }}
+          class="w-full max-w-xl mx-auto"
+        >
+          <div class="p-8 rounded-2xl bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-xl border border-gray-700/50 hover:border-blue-500/30 transition-all duration-500 shadow-lg shadow-blue-900/5 hover:shadow-blue-500/10">
+            <div class="flex items-center justify-center mb-6">
+              <div class="p-2 rounded-lg bg-blue-500/10 mr-3 animate-pulse-slow">
+                <Bell size={28} class="text-blue-400"/>
+              </div>
+              <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">Stay Updated</h3>
+            </div>
+            
+            <form class="flex flex-col sm:flex-row gap-4">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                class="flex-1 px-5 py-3.5 bg-gray-800/50 border border-gray-700/50 rounded-xl focus:outline-none focus:border-blue-500/50 focus:bg-gray-800/80 transition-all duration-300 placeholder-gray-500"
+              />
+              <button
+                type="submit"
+                class="px-6 py-3.5 bg-gradient-to-r from-blue-500/80 to-purple-500/80 hover:from-blue-500 hover:to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25 active:scale-95"
+              >
+                Notify Me
+              </button>
+            </form>
+            
+            <p class="text-xs text-gray-500 mt-4 text-center">
+              We respect your privacy. Unsubscribe at any time.
+            </p>
+          </div>
+        </div>
+
+        <!-- Social links -->
+        <div 
+          in:fly={{ y: 50, duration: 1000, delay: 1400 }}
+          class="flex gap-6 mt-12"
+        >
+        {#each [Github, Twitter, Mail] as Icon, i}
+        <a 
+          href={i === 0 ? "https://github.com/onkar69483/CodeDrop" : i === 1 ? "/" : "mailto:onkar69483@gmail.com"} 
+          class="p-3 rounded-full bg-gray-800/50 hover:bg-blue-500/20 transition-all duration-300 transform hover:scale-110 hover:rotate-6"
+          in:fly={{ y: 20, x: (i-1)*10, duration: 600, delay: 1600 + (i * 100), easing: elasticOut }}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Icon size={20} class="text-gray-400 hover:text-blue-300 transition-colors"/>
+        </a>
+      {/each}      
         </div>
       {/if}
     </div>
   </div>
+  
+  <!-- Curved bottom border -->
+  <div class="absolute bottom-0 left-0 right-0 overflow-hidden">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none" class="absolute bottom-0 w-full h-20 text-gray-800">
+      <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="currentColor" opacity=".25"></path>
+      <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="currentColor" opacity=".5"></path>
+      <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="currentColor"></path>
+    </svg>
+  </div>
 </div>
+
+<style>
+  @keyframes sparkle {
+    0%, 100% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1) rotate(180deg);
+      opacity: 0.3;
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-10px) scale(1.05);
+    }
+  }
+  
+  @keyframes glow-slow {
+    0%, 100% {
+      opacity: 0.2;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.3;
+      transform: scale(1.2);
+    }
+  }
+  
+  @keyframes glow-medium {
+    0%, 100% {
+      opacity: 0.15;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.25;
+      transform: scale(1.15);
+    }
+  }
+  
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  :global(body) {
+    overflow-x: hidden;
+    background: #111827;
+  }
+  
+  .font-space-grotesk {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  .animate-glow-slow {
+    animation: glow-slow 8s ease-in-out infinite;
+  }
+  
+  .animate-glow-medium {
+    animation: glow-medium 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-subtle {
+    animation: pulse-subtle 3s ease-in-out infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+  
+  .animate-gradient {
+    background-size: 200% auto;
+    animation: gradient 5s ease infinite;
+  }
+</style>

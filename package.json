@@ -53,6 +53,7 @@
 		"svelte-awesome-color-picker": "^3.1.0",
 		"svelte-copy": "^1.4.2",
 		"svelte-french-toast": "^1.2.0",
+		"svelte-motion": "^0.12.2",
 		"svelte-tags-input": "^6.0.0",
 		"svelte-toast": "^1.0.0",
 		"tailwindcss": "^3.3.5",
