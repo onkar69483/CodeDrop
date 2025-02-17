@@ -139,69 +139,68 @@
 
     <!-- Mobile Menu -->
     {#if isOpen}
+    <div 
+        class="fixed inset-0 bg-gradient-to-b from-[#0a192f] to-[#1a1f36] backdrop-blur-lg z-50"
+        transition:fade={{ duration: 200 }}
+        on:click={toggleMenu}
+    >
         <div 
-            class="fixed inset-0 bg-gray-900/95 backdrop-blur-md z-50"
-            transition:fade={{ duration: 200 }}
-            on:click={toggleMenu}
+            class="h-full w-full max-w-sm ml-auto bg-gradient-to-b from-[#112240] to-[#233554] backdrop-blur-md p-6 shadow-xl"
+            transition:slide={{ duration: 300, axis: 'x', easing: cubicOut }}
+            on:click|stopPropagation
         >
-            <div 
-                class="h-full w-full max-w-sm ml-auto bg-gradient-to-b from-gray-800/95 to-gray-900/95 backdrop-blur-md p-6"
-                transition:slide={{ duration: 300, axis: 'x', easing: cubicOut }}
-                on:click|stopPropagation
-            >
-                <div class="flex flex-col h-full">
-                    <div class="flex justify-between items-center mb-8">
-                        <span class="text-xl font-semibold text-white">Navigation</span>
-                        <button 
-                            class="p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition-all duration-200"
-                            on:click={toggleMenu}
-                        >
-                            <X size={24} />
-                        </button>
-                    </div>
-                    
-                    <nav class="flex flex-col space-y-4">
-                        {#each navItems as item}
-                            <a 
-                                href={item.href}
-                                class="group flex items-center justify-between p-4 rounded-xl bg-gray-800/30 hover:bg-gray-700/30 border border-gray-700/30 hover:border-blue-500/30 text-gray-300 hover:text-white transition-all duration-300"
-                            >
-                                <div class="flex items-center space-x-3">
-                                    <svelte:component this={item.icon} size={20} />
-                                    <span>{item.label}</span>
-                                </div>
-                                {#if item.badge}
-                                    <span class="px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 rounded-full border border-blue-500/20">
-                                        {item.badge}
-                                    </span>
-                                {/if}
-                            </a>
-                        {/each}
-                    </nav>
-
-                    <div class="mt-auto space-y-4">
-                        <!-- GitHub Link -->
+            <div class="flex flex-col h-full">
+                <div class="flex justify-between items-center mb-8">
+                    <span class="text-xl font-semibold text-white">Navigation</span>
+                    <button 
+                        class="p-2 rounded-lg bg-[#1e3a8a] hover:bg-[#2563eb] text-gray-300 hover:text-white transition-all duration-200"
+                        on:click={toggleMenu}
+                    >
+                        <X size={24} />
+                    </button>
+                </div>
+                
+                <nav class="flex flex-col space-y-4">
+                    {#each navItems as item}
                         <a 
-                            href="https://github.com/onkar69483/CodeDrop"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex items-center space-x-3 p-4 rounded-xl bg-gray-800/30 hover:bg-gray-700/30 border border-gray-700/30 hover:border-blue-500/30 text-gray-300 hover:text-white transition-all duration-300"
+                            href={item.href}
+                            class="group flex items-center justify-between p-4 rounded-xl bg-[#172a45] hover:bg-[#2c3e63] border border-[#1e3a8a] hover:border-[#3b82f6] text-white transition-all duration-300"
                         >
-                            <GithubIcon size={20} />
-                            <span>View on GitHub</span>
+                            <div class="flex items-center space-x-3">
+                                <svelte:component this={item.icon} size={20} />
+                                <span>{item.label}</span>
+                            </div>
+                            {#if item.badge}
+                                <span class="px-2 py-0.5 text-xs font-medium bg-blue-500 text-white rounded-full border border-blue-500">
+                                    {item.badge}
+                                </span>
+                            {/if}
                         </a>
+                    {/each}
+                </nav>
 
-                        <!-- Development Notice -->
-                        <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                            <p class="text-sm text-gray-300">
-                                🚧 CodeDrop is currently under development. New features coming soon!
-                            </p>
-                        </div>
+                <div class="mt-auto space-y-4">
+                    <!-- GitHub Link -->
+                    <a 
+                        href="https://github.com/onkar69483/CodeDrop"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-6 flex items-center space-x-3 p-4 rounded-xl bg-[#172a45] hover:bg-[#2c3e63] border border-[#1e3a8a] hover:border-[#3b82f6] text-white transition-all duration-300"
+                    >
+                        <GithubIcon size={20} />
+                        <span>View on GitHub</span>
+                    </a>
+                    <!-- Development Notice -->
+                    <div class="p-4 rounded-xl bg-[#2563eb] border border-[#3b82f6] shadow-lg">
+                        <p class="text-sm text-white">
+                            🚧 CodeDrop is currently under development. New features coming soon!
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-    {/if}
+    </div>
+{/if}
 </header>
 
 <style>
