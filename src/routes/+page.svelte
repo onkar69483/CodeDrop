@@ -37,7 +37,7 @@
       } else {
         clearInterval(interval);
       }
-    }, 50);
+    }, 150); // Slowed down the speed by increasing the interval time
 
     // Particle system
     initializeParticles();
