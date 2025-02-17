@@ -32,7 +32,11 @@
     
     // Progress animation
     const interval = setInterval(() => {
-      progress = (progress + 1) % 100;
+      if (progress < 29) {
+        progress += 1;
+      } else {
+        clearInterval(interval);
+      }
     }, 50);
 
     // Particle system
