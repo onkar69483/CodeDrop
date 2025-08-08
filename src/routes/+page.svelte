@@ -198,6 +198,16 @@
       showToast("Web Share API is not supported in your browser", "error");
     }
   }
+
+  async function copyPasteContent(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Content copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      showToast("Failed to copy content", "error");
+    }
+  }
 </script>
 
 <Hero />
@@ -411,6 +421,12 @@
                  >
                    👁️ View
                  </a>
+                <button
+                  on:click={() => copyPasteContent(paste.text)}
+                  class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg transition-colors"
+                >
+                  📋 Copy
+                </button>
                  <button
                    on:click={() => shareLink(paste.encryptedUrl)}
                    class="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
