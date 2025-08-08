@@ -41,6 +41,10 @@
 			{
 				name: "Skater Crow",
 				githubId: "SkaterCrow"
+			},
+			{
+				name: "Mihir Hebalkar",
+				githubId: "mihirhebalkar"
 			}
 		]
 	};
