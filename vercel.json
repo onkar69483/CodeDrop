@@ -1,4 +1,7 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "framework": "sveltekit",
   "crons": [
     {
       "path": "/api/cleanup",

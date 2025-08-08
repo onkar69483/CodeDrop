@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { decryptObjectId } from "$lib/serverEncryptUtil";
 
 const prisma = new PrismaClient();
 
@@ -9,15 +10,22 @@ function isValidObjectId(id) {
 
 export async function GET({ params }) {
   try {
-    const id = params.id;
+    const encryptedId = params.id;
     
     // Skip if it's a favicon or other static file request
-    if (id.includes('.') || !isValidObjectId(id)) {
+    if (encryptedId.includes('.') || encryptedId.includes('favicon')) {
       return new Response("Not found", { status: 404 });
     }
     
+    // Decrypt the ObjectId
+    const objectId = decryptObjectId(encryptedId);
+    
+    if (!objectId || !isValidObjectId(objectId)) {
+      return new Response("Invalid paste ID", { status: 404 });
+    }
+    
     const snippet = await prisma.paste.findUnique({
-      where: { id },
+      where: { id: objectId },
     });
 
     if (snippet) {
