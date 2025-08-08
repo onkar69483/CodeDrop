@@ -7,6 +7,16 @@ plugins: [sveltekit(), isoImport()],
 
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
+	},
+
+	optimizeDeps: {
+		exclude: [
+			'@mapbox/node-pre-gyp',
+			'mock-aws-s3',
+			'aws-sdk',
+			'nock',
+			'bcrypt'
+		]
 	}
 });
 
