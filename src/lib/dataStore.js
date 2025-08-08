@@ -43,6 +43,9 @@ export async function getAllPastes() {
         gt: now,
       },
     },
+    orderBy: {
+      createdAt: 'desc', //order by creation date descending
+    },
   });
 
   return pastes;
