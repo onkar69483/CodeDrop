@@ -47,3 +47,31 @@ export async function getAllPastes() {
 
   return pastes;
 }
+
+// Function to delete all expired pastes
+export async function deleteExpiredPastes() {
+  const now = new Date().getTime();
+  const result = await prisma.paste.deleteMany({
+    where: {
+      paste_expiration: {
+        lt: now,
+      },
+    },
+  });
+  console.log(`Deleted ${result.count} expired pastes`);
+  return result;
+}
+
+// Development cleanup function (for local testing)
+export function startDevCleanup() {
+  if (typeof window === 'undefined' && process.env.NODE_ENV === 'development') {
+    console.log('Starting development cleanup every 30 seconds...');
+    setInterval(async () => {
+      try {
+        await deleteExpiredPastes();
+      } catch (error) {
+        console.error('Dev cleanup error:', error);
+      }
+    }, 30000); // Run every 30 seconds in development
+  }
+}
