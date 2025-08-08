@@ -33,6 +33,10 @@
 			{
 				name: "Aryan Bachute",
 				githubId: "Aryanfour5"
+			},
+			{
+				name: "Janmejay Pandya",
+				githubId: "Janmejay-Pandya"
 			}
 		]
 	};
