@@ -1,51 +1,36 @@
-import crypto from 'crypto';
-import bcrypt from "bcrypt";
-const saltRounds = 1;
-const secretKey = "f464fdcbd76681b5b1e44ebfd2a5a4989ad4ab6db151bc10743e7147d34a3dff".slice(0,32);
-const iv = "7dbfb688da37f2ed35ee7f5f194a8ff8".slice(0,16);
+// Browser-compatible utility functions (no crypto operations)
 
 export function encryptData(data) {
-  const cipher = crypto.createCipheriv(
-    "aes-256-cbc",
-    Buffer.from(secretKey),
-    Buffer.from(iv)
-  );
-  let encryptedText = cipher.update(data, "utf8", "hex");
-  encryptedText += cipher.final("hex");
-  return encryptedText
+  // This function is not used in the browser
+  throw new Error('encryptData is server-side only');
 }
 
 export function decryptData(data) {
-  const decipher = crypto.createDecipheriv(
-    "aes-256-cbc",
-    Buffer.from(secretKey),
-    Buffer.from(iv)
-  );
-  let decryptedText = decipher.update(data, "hex", "utf8");
-  decryptedText += decipher.final("utf8");
-  return decryptedText
+  // This function is not used in the browser
+  throw new Error('decryptData is server-side only');
 }
 
-
-export async function hash(password){
-  try {
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    return hashedPassword;
-  } catch (error) {
-    throw error;
-  }
+export function encryptObjectId(objectId) {
+  // This function is not used in the browser
+  throw new Error('encryptObjectId is server-side only');
 }
 
-export async function checkPassword(userPassword,hashedPassword){
-  try {
-    const isMatch = await bcrypt.compare(userPassword, hashedPassword);
-    return isMatch;
-  } catch (error) {
-    return false
-  }
+export function decryptObjectId(encryptedId) {
+  // This function is not used in the browser
+  throw new Error('decryptObjectId is server-side only');
+}
+
+export function encryptUrlId(uuid) {
+  // This function is not used in the browser
+  throw new Error('encryptUrlId is server-side only');
+}
+
+export function generateUrlId() {
+  // This function is not used in the browser
+  throw new Error('generateUrlId is server-side only');
 }
 
 export function uniqueId(){
-  const uuid = crypto.randomUUID();
-  return uuid
+  // Browser-compatible UUID generation
+  return crypto.randomUUID();
 }

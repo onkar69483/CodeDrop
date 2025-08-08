@@ -12,6 +12,7 @@
   import Hero from "./components/Hero.svelte";
   import { fade, slide } from "svelte/transition";
   import { quintOut } from "svelte/easing";
+  import { enhance } from "$app/forms";
 
   let selectedLanguage = "markup";
   let isDragging = false;
@@ -19,6 +20,7 @@
   let toastMessage = "";
   let toastType = "success"; // 'success' or 'error'
   let currentTab = "editor"; // 'editor' or 'preview'
+  let createdPasteUrl = "";
 
   const languageOptions = [
     { value: "plaintext", label: "Plain Text", icon: "📝" },
@@ -102,7 +104,24 @@
     fileInput.value = "";
     pasteExpirationSelect.value = "1 minute";
     currentTab = "editor";
+    createdPasteUrl = "";
     showToast("All fields cleared");
+  }
+
+  function handleFormSubmit() {
+    return async ({ result }) => {
+      if (result.type === 'success' && result.data?.encryptedId) {
+        createdPasteUrl = `${window.location.origin}/${result.data.encryptedId}`;
+        showToast("Paste created successfully! Link copied to clipboard.");
+        try {
+          await navigator.clipboard.writeText(createdPasteUrl);
+        } catch (err) {
+          console.error("Failed to copy link:", err);
+        }
+      } else if (result.type === 'failure') {
+        showToast("Failed to create paste. Please try again.", "error");
+      }
+    };
   }
 
   function highlightSyntax() {
@@ -183,7 +202,7 @@
         <span class="mr-3">📋</span> Create a New Paste
       </h2>
 
-      <form method="POST" action="?/createPaste" class="space-y-6">
+      <form method="POST" action="?/createPaste" class="space-y-6" use:enhance={handleFormSubmit}>
         <!-- Title Input -->
         <div>
           <label for="title" class="block text-lg font-medium mb-2">
@@ -359,20 +378,20 @@
                 {paste.text}
               </p>
 
-              <div class="flex gap-3">
-                <a
-                  href={`/${paste.id}`}
-                  class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
-                >
-                  👁️ View
-                </a>
-                <button
-                  on:click={() => shareLink(paste.id)}
-                  class="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-                >
-                  📤 Share
-                </button>
-              </div>
+                             <div class="flex gap-3">
+                 <a
+                   href={`/${paste.encryptedUrl}`}
+                   class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+                 >
+                   👁️ View
+                 </a>
+                 <button
+                   on:click={() => shareLink(paste.encryptedUrl)}
+                   class="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                 >
+                   📤 Share
+                 </button>
+               </div>
             </div>
           {/each}
         </div>
