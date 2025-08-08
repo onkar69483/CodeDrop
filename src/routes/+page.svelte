@@ -108,8 +108,24 @@
     showToast("All fields cleared");
   }
 
+  function clearFieldsAfterSubmit() {
+    const titleInput = document.getElementById("title") as HTMLInputElement;
+    const textArea = document.getElementById("text") as HTMLTextAreaElement;
+    const fileInput = document.getElementById("file") as HTMLInputElement;
+    const pasteExpirationSelect = document.getElementById(
+      "paste_expiration"
+    ) as HTMLSelectElement;
+
+    titleInput.value = "";
+    textArea.value = "";
+    fileInput.value = "";
+    pasteExpirationSelect.value = "1 minute";
+    currentTab = "editor";
+    createdPasteUrl = "";
+  }
+
   function handleFormSubmit() {
-    return async ({ result }) => {
+    return async ({ result, update }) => {
       if (result.type === 'success' && result.data?.encryptedId) {
         createdPasteUrl = `${window.location.origin}/${result.data.encryptedId}`;
         showToast("Paste created successfully! Link copied to clipboard.");
@@ -118,6 +134,16 @@
         } catch (err) {
           console.error("Failed to copy link:", err);
         }
+        
+        // Small delay to ensure proper sequence
+        setTimeout(() => {
+          // Clear the form without showing "All fields cleared" toast
+          clearFieldsAfterSubmit();
+        }, 100);
+        
+        // Update the page data to show the new paste
+        await update();
+        
       } else if (result.type === 'failure') {
         showToast("Failed to create paste. Please try again.", "error");
       }
