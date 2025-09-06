@@ -6,7 +6,17 @@ const prisma = new PrismaClient();
 
 // Function to insert a new paste
 export async function insertPaste(data) {
-  const { text, title, password, paste_expiration, encrypted } = data;
+  const { text, title, password, paste_expiration, encrypted, roomCode } = data;
+
+  let roomId = undefined;
+  if (roomCode) {
+    const room = await prisma.room.findUnique({
+      where: { code: roomCode }
+    });
+    if (room) {
+      roomId = room.id;
+    }
+  }
 
   // Insert the new paste into MongoDB
   const newPaste = await prisma.paste.create({
@@ -16,6 +26,7 @@ export async function insertPaste(data) {
       password,
       paste_expiration,
       encrypted,
+      roomId
     },
   });
 

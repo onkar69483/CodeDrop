@@ -25,7 +25,10 @@
     }
 
     function handleNavClick(event) {
-        const targetId = event.target.getAttribute('href').split('#')[1];
+        const href = event.target.getAttribute('href');
+        if (!href || !href.includes('#')) return;
+        
+        const targetId = href.split('#')[1];
         const element = document.getElementById(targetId);
         
         if (element) {
@@ -65,8 +68,11 @@
 
             <!-- Desktop Navigation -->
             <nav class="hidden lg:flex items-center space-x-8">
-                {#each [{href: '/#create-pastes', label: 'Create Paste', icon: '✨'}, 
-                        {href: '/#recent-pastes', label: 'Recent Pastes', icon: '📋'}] as item}
+                {#each [
+                    {href: '/', label: 'Home', icon: '🏠'},
+                    {href: '/#create-room', label: 'Create Room', icon: '🔒'},
+                    {href: '/#recent-pastes', label: 'Public Pastes', icon: '📋'}
+                ] as item}
                     <a 
                         href={item.href}
                         on:click={handleNavClick}
@@ -126,8 +132,11 @@
                     </div>
                     
                     <nav class="flex flex-col space-y-4">
-                        {#each [{href: '/#create-pastes', label: 'Create Paste', icon: '✨'}, 
-                                {href: '/#recent-pastes', label: 'Recent Pastes', icon: '📋'}] as item}
+                        {#each [
+                            {href: '/', label: 'Home', icon: '🏠'},
+                            {href: '/#create-room', label: 'Create Room', icon: '🔒'},
+                            {href: '/#recent-pastes', label: 'Public Pastes', icon: '📋'}
+                        ] as item}
                             <a 
                                 href={item.href}
                                 on:click={handleNavClick}

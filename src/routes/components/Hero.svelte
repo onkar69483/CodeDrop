@@ -4,8 +4,8 @@
 
   const features = [
     { icon: Code2, text: "Share code snippets instantly" },
-    { icon: Lock, text: "Secure, encrypted sharing" },
-    { icon: Clock, text: "Set custom expiration times" },
+    { icon: Lock, text: "Create private collaboration rooms" },
+    { icon: Clock, text: "Real-time team collaboration" },
   ];
 
   function scrollToCreate() {
@@ -40,8 +40,8 @@
         </h1>
 
         <p class="text-lg text-gray-300 text-center lg:text-left mb-8 max-w-xl">
-          Share code snippets securely and efficiently. Set expiration times for automatic 
-          deletion, ensuring your code stays private and controlled.
+          Create private collaboration rooms or share publicly. Work together in real-time 
+          with your team using secure, simple, and efficient code sharing.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 mb-12 w-full sm:w-auto">
