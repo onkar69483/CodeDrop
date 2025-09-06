@@ -122,6 +122,18 @@
 			{
 				name: "Aryan Bachute",
 				githubId: "Aryanfour5"
+			},
+			{
+				name: "Janmejay Pandya",
+				githubId: "Janmejay-Pandya"
+			},
+			{
+				name: "Skater Crow",
+				githubId: "SkaterCrow"
+			},
+			{
+				name: "Mihir Hebalkar",
+				githubId: "mihirhebalkar"
 			}
 		]
 	};
