@@ -19,12 +19,21 @@ model Snippet {
   createdAt DateTime @default(now())
 }
 
+model Room {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  code      String   @unique
+  createdAt DateTime @default(now())
+  pastes    Paste[]
+}
+
 model Paste {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  text           String
-  title          String
-  password       String?
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  text            String
+  title           String
+  password        String?
   paste_expiration Int?
-  encrypted      Int?
-  createdAt      DateTime @default(now())
+  encrypted       Int?
+  createdAt       DateTime @default(now())
+  roomId          String?  @db.ObjectId
+  room            Room?    @relation(fields: [roomId], references: [id])
 }
