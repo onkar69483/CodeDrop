@@ -21,6 +21,8 @@
   let toastType = "success"; // 'success' or 'error'
   let currentTab = "editor"; // 'editor' or 'preview'
   let createdPasteUrl = "";
+  let showModerationPopup = false;
+  let moderationMessage = "";
 
   const languageOptions = [
     { value: "plaintext", label: "Plain Text", icon: "📝" },
@@ -54,6 +56,16 @@
           showSuccessToast = false;
           toastMessage = '';
       }, 3000);
+  }
+
+  function showContentModerationPopup(message: string) {
+    moderationMessage = message;
+    showModerationPopup = true;
+  }
+
+  function closeModerationPopup() {
+    showModerationPopup = false;
+    moderationMessage = "";
   }
 
   function handleDragEnter(e: DragEvent) {
@@ -126,6 +138,18 @@
 
   function handleFormSubmit() {
     return async ({ result, update }) => {
+      // Check if the data contains a failure response (SvelteKit wraps failures in success)
+      if (result.data?.type === 'failure') {
+        if (result.data.data?.inappropriate) {
+          showContentModerationPopup(result.data.data.message);
+        } else if (result.data.data?.moderationError) {
+          showToast(result.data.data.message, "error");
+        } else {
+          showToast("Failed to create paste. Please try again.", "error");
+        }
+        return;
+      }
+      
       if (result.type === 'success' && result.data?.encryptedId) {
         createdPasteUrl = `${window.location.origin}/${result.data.encryptedId}`;
         showToast("Paste created successfully! Link copied to clipboard.");
@@ -145,7 +169,13 @@
         await update();
         
       } else if (result.type === 'failure') {
-        showToast("Failed to create paste. Please try again.", "error");
+        if (result.data?.inappropriate) {
+          showContentModerationPopup(result.data.message);
+        } else if (result.data?.moderationError) {
+          showToast(result.data.message, "error");
+        } else {
+          showToast("Failed to create paste. Please try again.", "error");
+        }
       }
     };
   }
@@ -226,6 +256,46 @@
     </div>
 {/if}
 
+<!-- Content Moderation Popup -->
+{#if showModerationPopup}
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] flex items-center justify-center p-4" transition:fade={{ duration: 200 }}>
+        <div class="bg-gray-800 rounded-xl shadow-2xl p-8 max-w-lg w-full border border-red-500/50" transition:slide={{ duration: 300 }}>
+            <div class="flex items-center gap-4 mb-6">
+                <div class="flex-shrink-0 w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <span class="text-2xl">🚫</span>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-red-400">Content Blocked</h3>
+                    <p class="text-gray-400 text-sm">Your paste contains inappropriate content</p>
+                </div>
+            </div>
+            
+            <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
+                <p class="text-red-300 font-medium mb-2">Reason:</p>
+                <p class="text-gray-300 leading-relaxed">
+                    {moderationMessage.replace('Content contains inappropriate language: ', '')}
+                </p>
+            </div>
+            
+            <div class="bg-gray-700/50 rounded-lg p-4 mb-6">
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    <span class="font-medium text-blue-400">💡 What to do:</span><br>
+                    Please review your title and content, remove any inappropriate language, and try submitting again.
+                </p>
+            </div>
+            
+            <div class="flex justify-end gap-3">
+                <button 
+                    on:click={closeModerationPopup}
+                    class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all font-medium transform hover:scale-105"
+                >
+                    ✓ Got it, I'll fix it
+                </button>
+            </div>
+        </div>
+    </div>
+{/if}
+
 <div
   id="create-pastes" class="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white px-4 py-8 md:px-6"
 >
@@ -238,7 +308,7 @@
         <span class="mr-3">📋</span> Create a New Paste
       </h2>
 
-      <form method="POST" action="?/createPaste" class="space-y-6" use:enhance={handleFormSubmit}>
+      <form method="POST" action="?/createPaste" enctype="multipart/form-data" class="space-y-6" use:enhance={handleFormSubmit}>
         <!-- Title Input -->
         <div>
           <label for="title" class="block text-lg font-medium mb-2">
