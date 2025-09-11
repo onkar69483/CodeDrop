@@ -3,7 +3,7 @@
 
 </script>
 
-<section class="relative h-screen flex items-center justify-center overflow-hidden bg-slate-900 group">
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900 group pt-20 md:pt-0">
   <!-- Animated Background Elements -->
   <div class="absolute inset-0">
     <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse group-hover:scale-110 transition-transform duration-1000"></div>
@@ -47,49 +47,50 @@
     
   </div>
   
-  <div class="relative z-10 max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
-    <!-- Left Content -->
-    <div class="text-center lg:text-left">
-      <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
-        Code Sharing
-        <span class="block bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent pb-2">
-          Reimagined
-        </span>
-      </h1>
-      
-      <p class="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed">
-        Share code snippets instantly with beautiful syntax highlighting, automatic expiration, and enterprise-grade security.
-      </p>
-
-      <!-- CTA Button -->
-      <a 
-        href="#create-pastes" 
-        class="group inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-blue-500/25"
-      >
-        <Terminal class="w-5 h-5 group-hover:rotate-12 transition-transform" />
-        <span>Create Your First Paste</span>
-        <ArrowRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-      </a>
-    </div>
-
-    <!-- Right Content - Code Example -->
-    <div class="relative">
-      <div class="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden">
-        <!-- Code Header -->
-        <div class="bg-slate-900/80 px-6 py-4 border-b border-slate-700/50">
-          <div class="flex items-center space-x-4">
-            <div class="flex space-x-2">
-              <div class="w-3 h-3 rounded-full bg-red-500"></div>
-              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
-            </div>
-            <span class="text-slate-400 text-sm font-mono">example.js</span>
-          </div>
-        </div>
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <!-- Left Content -->
+      <div class="text-center lg:text-left order-1 lg:order-1">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 md:mb-8 leading-tight">
+          Code Sharing
+          <span class="block bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent pb-2">
+            Reimagined
+          </span>
+        </h1>
         
-        <!-- Code Content -->
-        <div class="p-6 bg-slate-900">
-          <pre class="text-sm font-mono text-slate-300 leading-relaxed"><code><span class="text-purple-400">function</span> <span class="text-blue-400">shareCode</span>(<span class="text-orange-400">snippet</span>) {'{'}
+        <p class="text-base sm:text-lg md:text-xl text-slate-300 mb-6 md:mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+          Share code snippets instantly with beautiful syntax highlighting, automatic expiration, and enterprise-grade security.
+        </p>
+
+        <!-- CTA Button -->
+        <a 
+          href="#create-pastes" 
+          class="group inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-blue-500/25 text-sm sm:text-base"
+        >
+          <Terminal class="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform" />
+          <span>Create Your First Paste</span>
+          <ArrowRight class="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
+        </a>
+      </div>
+
+      <!-- Right Content - Code Example -->
+      <div class="relative order-2 lg:order-2 mb-8 lg:mb-0">
+        <div class="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden max-w-lg mx-auto lg:max-w-none">
+          <!-- Code Header -->
+          <div class="bg-slate-900/80 px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-700/50">
+            <div class="flex items-center space-x-3 sm:space-x-4">
+              <div class="flex space-x-1.5 sm:space-x-2">
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
+              </div>
+              <span class="text-slate-400 text-xs sm:text-sm font-mono">example.js</span>
+            </div>
+          </div>
+          
+          <!-- Code Content -->
+          <div class="p-4 sm:p-6 bg-slate-900 overflow-x-auto">
+            <pre class="text-xs sm:text-sm font-mono text-slate-300 leading-relaxed whitespace-pre-wrap"><code><span class="text-purple-400">function</span> <span class="text-blue-400">shareCode</span>(<span class="text-orange-400">snippet</span>) {'{'}
   <span class="text-gray-500">// Upload to CodeDrop</span>
   <span class="text-purple-400">const</span> <span class="text-blue-400">response</span> = <span class="text-purple-400">await</span> <span class="text-green-400">fetch</span>(<span class="text-yellow-400">'/api/paste'</span>, {'{'}
     <span class="text-blue-400">method</span>: <span class="text-yellow-400">'POST'</span>,
@@ -98,12 +99,13 @@
   
   <span class="text-purple-400">return</span> <span class="text-orange-400">response</span>.<span class="text-blue-400">url</span>; <span class="text-gray-500">// ✨ Instant share!</span>
 {'}'}</code></pre>
+          </div>
         </div>
-      </div>
-      
-      <!-- Floating badge -->
-      <div class="absolute -top-4 -right-4 bg-gradient-to-br from-cyan-400 to-blue-500 p-3 rounded-lg shadow-lg">
-        <Sparkles class="w-5 h-5 text-white" />
+        
+        <!-- Floating badge -->
+        <div class="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-gradient-to-br from-cyan-400 to-blue-500 p-2 sm:p-3 rounded-lg shadow-lg">
+          <Sparkles class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+        </div>
       </div>
     </div>
   </div>
