@@ -1,8 +1,8 @@
-
 import { error } from "@sveltejs/kit";
 import { uniqueId, encryptObjectId } from "$lib/serverEncryptUtil";
 import { hash } from "$lib/serverUtil";
 import { insertPaste, initializeDatabase, getAllPastes } from "$lib/dataStore";
+import { moderateContent } from "$lib/contentModeration.js";
 
 export const actions = {
   createPaste: async ({ request }) => {
@@ -12,6 +12,19 @@ export const actions = {
     const paste_expiration = formData.get("paste_expiration");
 
     try {
+      // Content moderation check
+      const moderationResult = await moderateContent(title, text);
+      
+      if (!moderationResult.isAppropriate) {
+        return {
+          type: 'failure',
+          status: 400,
+          data: {
+            message: `Content contains inappropriate language: ${moderationResult.reason}`,
+            inappropriate: true
+          }
+        };
+      }
       const expirationTimestamp = paste_expiration === 'never' ? null : Date.now() + parseExpirationTime(paste_expiration);
       const dataToBeInserted = {
         text,
@@ -24,6 +37,18 @@ export const actions = {
       return { success: true, encryptedId };
     } catch (err) {
       console.error("Error creating paste:", err);
+      
+      // Check if it's a moderation error
+      if (err.message.includes('Content moderation service')) {
+        return {
+          type: 'failure',
+          data: {
+            message: err.message,
+            moderationError: true
+          }
+        };
+      }
+      
       throw error(500, "An error occurred while creating the paste. Please try again later.");
     }
   },
