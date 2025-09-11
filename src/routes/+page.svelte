@@ -13,6 +13,8 @@
   import { fade, slide } from "svelte/transition";
   import { quintOut } from "svelte/easing";
   import { enhance } from "$app/forms";
+  import { FileText, Upload, Eye, Copy, Share2, Clock, Trash2, Plus, Sparkles } from 'lucide-svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   let selectedLanguage = "markup";
   let isDragging = false;
@@ -23,6 +25,8 @@
   let createdPasteUrl = "";
   let showModerationPopup = false;
   let moderationMessage = "";
+  let currentTime = new Date();
+  let timeUpdateInterval;
 
   const languageOptions = [
     { value: "plaintext", label: "Plain Text", icon: "📝" },
@@ -34,19 +38,39 @@
     { value: "java", label: "Java", icon: "☕" },
   ];
 
-  function formatExpirationTime(expirationTimestamp: number | null): string {
-    if (expirationTimestamp === null) return "Never";
+  // Reactive function to format expiration time with live updates
+  $: formatExpirationTime = (expirationDate) => {
+    if (!expirationDate) return 'Never expires';
+    
+    const expiry = new Date(expirationDate);
+    const timeDiff = expiry.getTime() - currentTime.getTime();
+    
+    if (timeDiff <= 0) return 'Expired';
+    
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+    
+    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+    if (minutes > 0) return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
+  };
 
-    const now = Date.now();
-    const secondsRemaining = Math.floor((expirationTimestamp - now) / 1000);
+  // Start live time updates
+  onMount(() => {
+    timeUpdateInterval = setInterval(() => {
+      currentTime = new Date();
+    }, 1000);
+  });
 
-    if (secondsRemaining <= 0) return "Expired";
-    if (secondsRemaining < 60) return `${secondsRemaining}s`;
-    if (secondsRemaining < 3600) return `${Math.floor(secondsRemaining / 60)}m`;
-    if (secondsRemaining < 86400)
-      return `${Math.floor(secondsRemaining / 3600)}h`;
-    return `${Math.floor(secondsRemaining / 86400)}d`;
-  }
+  // Cleanup interval on component destroy
+  onDestroy(() => {
+    if (timeUpdateInterval) {
+      clearInterval(timeUpdateInterval);
+    }
+  });
 
   function showToast(message: string, type: 'success' | 'error' = 'success') {
       toastMessage = message;
@@ -104,17 +128,17 @@
   }
 
   function clearFields() {
-    const titleInput = document.getElementById("title") as HTMLInputElement;
-    const textArea = document.getElementById("text") as HTMLTextAreaElement;
-    const fileInput = document.getElementById("file") as HTMLInputElement;
-    const pasteExpirationSelect = document.getElementById(
-      "paste_expiration"
-    ) as HTMLSelectElement;
+    const titleInput = document.getElementById("title");
+    const textArea = document.getElementById("text");
+    const languageSelect = document.getElementById("language");
+    const expirationSelect = document.getElementById("paste_expiration");
 
-    titleInput.value = "";
-    textArea.value = "";
-    fileInput.value = "";
-    pasteExpirationSelect.value = "1 minute";
+    if (titleInput) titleInput.value = "";
+    if (textArea) textArea.value = "";
+    if (languageSelect) languageSelect.selectedIndex = 0;
+    if (expirationSelect) expirationSelect.selectedIndex = 0;
+
+    selectedLanguage = "text";
     currentTab = "editor";
     createdPasteUrl = "";
     showToast("All fields cleared");
@@ -297,16 +321,28 @@
 {/if}
 
 <div
-  id="create-pastes" class="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white px-4 py-8 md:px-6"
+  id="create-pastes" class="min-h-screen bg-slate-900 text-white px-4 py-24 md:px-6 rounded-bl-3xl rounded-br-3xl"
 >
-  <div class="max-w-5xl mx-auto">
+  <div class="max-w-6xl mx-auto">
     <!-- Create Paste Section -->
     <div
-      class="bg-gray-800 rounded-xl shadow-2xl p-6 mb-8 border border-gray-700"
+      class="bg-slate-800/50 rounded-3xl shadow-2xl p-8 mb-16 border border-slate-700/50 backdrop-blur-sm"
     >
-      <h2 class="text-3xl font-bold mb-6 flex items-center">
-        <span class="mr-3">📋</span> Create a New Paste
-      </h2>
+      <div class="flex items-center justify-between mb-10">
+        <div class="flex items-center space-x-4">
+          <div class="p-3 bg-blue-500/10 rounded-2xl border border-blue-500/20">
+            <Plus class="w-8 h-8 text-blue-400" />
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold text-white">Create New Paste</h2>
+            <p class="text-slate-400 mt-1">Share your code with the world</p>
+          </div>
+        </div>
+        <div class="px-4 py-2 bg-slate-700/50 text-slate-300 text-sm rounded-xl border border-slate-600/50 flex items-center space-x-2">
+          <Sparkles class="w-4 h-4" />
+          <span>Instant Share</span>
+        </div>
+      </div>
 
       <form method="POST" action="?/createPaste" enctype="multipart/form-data" class="space-y-6" use:enhance={handleFormSubmit}>
         <!-- Title Input -->
@@ -319,22 +355,26 @@
             id="title"
             name="title"
             required
-            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
+            class="w-full bg-slate-700/50 border border-slate-600/50 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
             placeholder="Enter a descriptive title..."
           />
         </div>
 
         <!-- Language Selector -->
         <div>
-          <label class="block text-lg font-medium mb-2"> Language </label>
+          <label for="language" class="block text-lg font-medium mb-2 flex items-center space-x-2">
+            <FileText class="w-5 h-5" />
+            <span>Language</span>
+          </label>
           <select
+            id="language"
             bind:value={selectedLanguage}
             on:change={handleLanguageChange}
-            class="w-full md:w-1/3 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
+            class="w-full md:w-1/3 bg-slate-700/50 border border-slate-600/50 rounded-xl px-4 py-3 pr-12 text-white focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 appearance-none cursor-pointer"
+            style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 4 5\'%3E%3Cpath fill=\'%23ffffff\' d=\'M2 0L0 2h4zm0 5L0 3h4z\'/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px;"
           >
             {#each languageOptions as option}
               <option value={option.value}>
-                {option.icon}
                 {option.label}
               </option>
             {/each}
@@ -359,40 +399,47 @@
           />
           <label
             for="file"
-            class="block p-8 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors text-center"
+            class="block p-8 border-2 border-dashed border-slate-600/50 rounded-2xl cursor-pointer hover:border-blue-500/50 hover:bg-blue-500/5 transition-all duration-300 text-center group"
           >
-            <div class="text-4xl mb-2">📂</div>
-            <span class="text-lg">Drop files here or click to upload</span>
+            <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-slate-700/50 rounded-2xl group-hover:scale-110 transition-transform duration-300">
+              <Upload class="w-8 h-8 text-slate-400 group-hover:text-blue-400" />
+            </div>
+            <div class="space-y-2">
+              <span class="text-xl font-medium text-white">Drop files here or click to upload</span>
+              <p class="text-sm text-slate-400">Supports: .txt, .css, .html, .js, .ts, .py, .java</p>
+            </div>
           </label>
           {#if isDragging}
             <div
-              class="absolute inset-0 bg-blue-500 bg-opacity-10 rounded-lg border-2 border-blue-500 pointer-events-none"
+              class="absolute inset-0 bg-blue-500/10 rounded-2xl border-2 border-blue-500/50 pointer-events-none"
             ></div>
           {/if}
         </div>
 
         <!-- Editor Tabs -->
-        <div class="border border-gray-700 rounded-lg overflow-hidden">
-          <div class="flex bg-gray-900 px-4 py-2 gap-4">
+        <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl overflow-hidden">
+          <div class="flex bg-slate-900/50 px-6 py-4 gap-2 border-b border-slate-700/50">
             <button
               type="button"
-              class="px-4 py-2 rounded-lg transition-colors {currentTab ===
+              class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 {currentTab ===
               'editor'
                 ? 'bg-blue-500 text-white'
-                : 'text-gray-400 hover:text-white'}"
+                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}"
               on:click={() => (currentTab = "editor")}
             >
-              ✏️ Editor
+              <FileText class="w-4 h-4" />
+              <span>Editor</span>
             </button>
             <button
               type="button"
-              class="px-4 py-2 rounded-lg transition-colors {currentTab ===
+              class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 {currentTab ===
               'preview'
                 ? 'bg-blue-500 text-white'
-                : 'text-gray-400 hover:text-white'}"
+                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}"
               on:click={highlightSyntax}
             >
-              👁️ Preview
+              <Eye class="w-4 h-4" />
+              <span>Preview</span>
             </button>
           </div>
 
@@ -400,9 +447,9 @@
             <textarea
               id="text"
               name="text"
-              rows="10"
+              rows="12"
               required
-              class="w-full bg-gray-900 p-4 focus:outline-none font-mono {currentTab ===
+              class="w-full bg-slate-900/50 border-0 px-6 py-4 text-white placeholder-slate-400 focus:outline-none resize-none font-mono {currentTab ===
               'editor'
                 ? 'block'
                 : 'hidden'}"
@@ -410,7 +457,7 @@
             ></textarea>
             <div
               id="code-preview"
-              class="w-full bg-gray-900 p-4 max-h-[500px] overflow-auto {currentTab ===
+              class="w-full bg-slate-900/50 p-6 max-h-[500px] overflow-auto {currentTab ===
               'preview'
                 ? 'block'
                 : 'hidden'}"
@@ -420,97 +467,132 @@
 
         <!-- Expiration Selector -->
         <div>
-          <label for="paste_expiration" class="block text-lg font-medium mb-2">
-            Expiration Time
+          <label for="paste_expiration" class="block text-lg font-medium mb-2 flex items-center space-x-2">
+            <Clock class="w-5 h-5" />
+            <span>Expiration Time</span>
           </label>
           <select
             id="paste_expiration"
             name="paste_expiration"
-            class="w-full md:w-1/3 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
+            class="w-full md:w-1/3 bg-slate-700/50 border border-slate-600/50 rounded-xl px-4 py-3 pr-12 text-white focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 appearance-none cursor-pointer"
+            style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 4 5\'%3E%3Cpath fill=\'%23ffffff\' d=\'M2 0L0 2h4zm0 5L0 3h4z\'/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px;"
           >
-            <option value="1 minute">⏱️ 1 Minute</option>
-            <option value="5 minutes">⏱️ 5 Minutes</option>
-            <option value="10 minutes">⏱️ 10 Minutes</option>
-            <option value="1 hour">⏱️ 1 Hour</option>
-            <option value="1 day">📅 1 Day</option>
-            <option value="1 week">📅 1 Week</option>
-            <option value="1 month">📅 1 Month</option>
-            <option value="2 months">📅 2 Months</option>
-            <option value="6 months">📅 6 Months</option>
-            <option value="12 months">📅 12 Months</option>
+            <option value="1 minute">1 Minute</option>
+            <option value="5 minutes">5 Minutes</option>
+            <option value="10 minutes">10 Minutes</option>
+            <option value="1 hour">1 Hour</option>
+            <option value="1 day">1 Day</option>
+            <option value="1 week">1 Week</option>
+            <option value="1 month">1 Month</option>
+            <option value="2 months">2 Months</option>
+            <option value="6 months">6 Months</option>
+            <option value="12 months">12 Months</option>
           </select>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex flex-col md:flex-row gap-4 pt-6">
           <button
             type="submit"
-            class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all transform hover:scale-105"
+            class="flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105"
           >
-            💾 Save Paste
+            <Plus class="w-5 h-5" />
+            <span>Create Paste</span>
           </button>
           <button
             type="button"
             on:click={clearFields}
-            class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium rounded-lg transition-all transform hover:scale-105"
+            class="flex items-center justify-center space-x-3 bg-slate-700/50 hover:bg-slate-600/50 text-white font-medium px-8 py-4 rounded-xl transition-all duration-200"
           >
-            🗑️ Clear All
+            <Trash2 class="w-5 h-5" />
+            <span>Clear All</span>
           </button>
         </div>
       </form>
     </div>
 
     <!-- Recent Pastes Section -->
-    <div id="recent-pastes" class="bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700">
-      <h2 class="text-3xl font-bold mb-6 flex items-center">
-        <span class="mr-3">📚</span> Recent Pastes
-      </h2>
+    <div id="recent-pastes" class="bg-slate-800/50 rounded-3xl shadow-2xl p-8 border border-slate-700/50 backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-10">
+        <div class="flex items-center space-x-4">
+          <div class="p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
+            <Clock class="w-8 h-8 text-purple-400" />
+          </div>
+          <div>
+            <h2 class="text-3xl font-bold text-white">Recent Pastes</h2>
+            <p class="text-slate-400 mt-1">Your latest code snippets</p>
+          </div>
+        </div>
+        <div class="px-4 py-2 bg-slate-700/50 text-slate-300 text-sm rounded-xl border border-slate-600/50 flex items-center space-x-2">
+          <Clock class="w-4 h-4" />
+          <span>Latest Activity</span>
+        </div>
+      </div>
 
       {#if data.pastes && data.pastes.length > 0}
         <div class="grid gap-4">
           {#each data.pastes as paste}
             <div
-              class="bg-gray-900 rounded-lg p-6 border border-gray-700 hover:border-blue-500 transition-all"
+              class="bg-slate-700/30 hover:bg-slate-700/50 rounded-2xl p-6 border border-slate-600/50 hover:border-slate-500/50 transition-all duration-300 group overflow-hidden"
               transition:slide={{ duration: 300, easing: quintOut }}
             >
               <div class="flex justify-between items-start mb-4">
-                <h3 class="text-xl font-bold">{paste.title}</h3>
-                <span class="bg-gray-700 px-3 py-1 rounded-full text-sm">
-                  ⏳ {formatExpirationTime(paste.paste_expiration)}
-                </span>
+                <h3 class="text-xl font-bold text-white group-hover:text-slate-200 transition-colors">{paste.title || 'Untitled Paste'}</h3>
+                <div class="flex items-center space-x-2">
+                  {#if paste.paste_expiration}
+                    <span class="px-3 py-1.5 bg-orange-500/20 text-orange-400 text-xs rounded-full border border-orange-500/30 flex items-center space-x-1">
+                      <Clock class="w-3 h-3" />
+                      <span>{formatExpirationTime(paste.paste_expiration)}</span>
+                    </span>
+                  {:else}
+                    <span class="px-3 py-1.5 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-500/30">
+                      Never expires
+                    </span>
+                  {/if}
+                </div>
               </div>
-
-              <p class="mb-4 text-gray-300 line-clamp-3 font-mono text-sm">
-                {paste.text}
+              <p class="text-slate-300 mb-4 line-clamp-3 leading-relaxed break-words overflow-hidden">
+                {paste.text ? paste.text.substring(0, 150) + '...' : 'No content available'}
               </p>
-
-                             <div class="flex gap-3">
-                 <a
-                   href={`/${paste.encryptedUrl}`}
-                   class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
-                 >
-                   👁️ View
-                 </a>
-                <button
-                  on:click={() => copyPasteContent(paste.text)}
-                  class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg transition-colors"
-                >
-                  📋 Copy
-                </button>
-                 <button
-                   on:click={() => shareLink(paste.encryptedUrl)}
-                   class="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-                 >
-                   📤 Share
-                 </button>
-               </div>
+              <div class="flex justify-between items-center pt-4 border-t border-slate-700/50">
+                <div class="flex items-center space-x-2 text-sm text-slate-400">
+                  <Clock class="w-4 h-4" />
+                  <span>Created {paste.createdAt ? new Date(paste.createdAt).toLocaleDateString() : 'Unknown date'}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <a
+                    href="/{paste.encryptedUrl}"
+                    class="flex items-center space-x-2 px-3 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-white text-sm rounded-lg transition-all"
+                  >
+                    <Eye class="w-4 h-4" />
+                    <span>View</span>
+                  </a>
+                  <button
+                    on:click={() => navigator.clipboard.writeText(paste.text)}
+                    class="flex items-center space-x-2 px-3 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-white text-sm rounded-lg transition-all"
+                  >
+                    <Copy class="w-4 h-4" />
+                    <span>Copy</span>
+                  </button>
+                  <button
+                    on:click={() => navigator.share ? navigator.share({title: paste.title, url: `${window.location.origin}/${paste.encryptedUrl}`}) : navigator.clipboard.writeText(`${window.location.origin}/${paste.encryptedUrl}`)}
+                    class="flex items-center space-x-2 px-3 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-white text-sm rounded-lg transition-all"
+                  >
+                    <Share2 class="w-4 h-4" />
+                    <span>Share</span>
+                  </button>
+                </div>
+              </div>
             </div>
           {/each}
         </div>
       {:else}
-        <div class="text-center py-8 text-gray-400">
-          <div class="text-4xl mb-4">📭</div>
-          <p>No pastes found. Create your first paste above!</p>
+        <div class="text-center py-12 text-slate-400">
+          <div class="flex items-center justify-center w-24 h-24 mx-auto mb-6 bg-slate-700/30 rounded-3xl">
+            <FileText class="w-12 h-12 text-slate-500" />
+          </div>
+          <h3 class="text-xl font-medium mb-2 text-white">No pastes yet</h3>
+          <p class="text-slate-500">Create your first paste above to get started!</p>
         </div>
       {/if}
     </div>

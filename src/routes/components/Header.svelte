@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { fade, slide } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
+    import { Menu, X, Code2, FileText, Clock } from 'lucide-svelte';
     
     let isOpen = false;
     let prevScrollPos = 0;
@@ -47,57 +48,49 @@
 </script>
 
 <header 
-    class="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md {isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} {isScrolled ? 'bg-gray-900/95 shadow-xl' : 'bg-transparent'}"
+    class="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md {isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} {isScrolled ? 'bg-gray-900/80 shadow-xl border-b border-gray-700/50' : 'bg-gray-900/60'}"
 >
     <div class="container mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
             <!-- Logo -->
             <a 
                 href="/" 
-                class="relative group"
+                class="flex items-center space-x-3 group"
             >
-                <span class="text-3xl font-bold text-white tracking-wide transition-colors duration-300 group-hover:text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500" 
+                <div class="p-2 bg-slate-800/50 rounded-lg border border-slate-700/50 group-hover:border-slate-600/50 transition-colors">
+                    <Code2 class="w-6 h-6 text-blue-400" />
+                </div>
+                <span class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500" 
                       style="font-family: 'Dancing Script', cursive;">
-                CodeDrop
+                    CodeDrop
                 </span>
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 group-hover:w-full"></span>
             </a>
 
             <!-- Desktop Navigation -->
-            <nav class="hidden lg:flex items-center space-x-8">
-                {#each [{href: '/#create-pastes', label: 'Create Paste', icon: '✨'}, 
-                        {href: '/#recent-pastes', label: 'Recent Pastes', icon: '📋'}] as item}
+            <nav class="hidden lg:flex items-center space-x-1">
+                {#each [{href: '/#create-pastes', label: 'Create', icon: FileText}, 
+                        {href: '/#recent-pastes', label: 'Recent', icon: Clock}] as item}
                     <a 
                         href={item.href}
                         on:click={handleNavClick}
-                        class="group relative px-2 py-1 text-gray-300 hover:text-white transition-colors duration-200"
+                        class="flex items-center space-x-2 px-4 py-2 text-gray-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all duration-200"
                     >
-                        <span class="flex items-center space-x-2">
-                            <span class="text-sm">{item.icon}</span>
-                            <span>{item.label}</span>
-                        </span>
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                        <svelte:component this={item.icon} class="w-4 h-4" />
+                        <span>{item.label}</span>
                     </a>
                 {/each}
-                
-                <!-- Theme Toggle Button (Optional) -->
-                <button 
-                    class="p-2 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors duration-200 text-gray-300 hover:text-white"
-                >
-                    <span class="text-sm">🌙</span>
-                </button>
             </nav>
 
             <!-- Mobile Menu Button -->
             <button 
-                class="lg:hidden relative w-10 h-10 flex items-center justify-center text-gray-300 hover:text-white focus:outline-none"
+                class="lg:hidden p-2 text-gray-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all duration-200"
                 on:click={toggleMenu}
             >
-                <div class="w-6 h-6 flex flex-col justify-center space-y-1.5 transition-all duration-300 {isOpen ? 'transform rotate-180' : ''}">
-                    <span class="w-full h-0.5 bg-current transform transition-all duration-300 {isOpen ? 'rotate-45 translate-y-2' : ''}"></span>
-                    <span class="w-full h-0.5 bg-current transition-all duration-300 {isOpen ? 'opacity-0' : 'opacity-100'}"></span>
-                    <span class="w-full h-0.5 bg-current transform transition-all duration-300 {isOpen ? '-rotate-45 -translate-y-2' : ''}"></span>
-                </div>
+                {#if isOpen}
+                    <X class="w-6 h-6" />
+                {:else}
+                    <Menu class="w-6 h-6" />
+                {/if}
             </button>
         </div>
     </div>
@@ -108,11 +101,17 @@
             class="fixed inset-0 bg-gray-900/95 backdrop-blur-sm z-50"
             transition:fade={{ duration: 200 }}
             on:click={toggleMenu}
+            on:keydown={(e) => e.key === 'Escape' && toggleMenu()}
+            role="button"
+            tabindex="0"
         >
             <div 
                 class="h-full max-w-sm ml-auto bg-gray-800/95 backdrop-blur-sm p-6"
                 transition:slide={{ duration: 300, axis: 'x', easing: cubicOut }}
                 on:click|stopPropagation
+                on:keydown|stopPropagation
+                role="dialog"
+                tabindex="-1"
             >
                 <div class="flex flex-col h-full">
                     <div class="flex justify-between items-center mb-8">
