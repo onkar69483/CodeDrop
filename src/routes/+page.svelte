@@ -321,9 +321,9 @@
 {/if}
 
 <div
-  id="create-pastes" class="min-h-screen bg-slate-900 text-white px-4 py-24 md:px-6"
+  id="create-pastes" class="min-h-screen bg-slate-900 text-white px-4 py-24 md:px-6 rounded-bl-3xl rounded-br-3xl"
 >
-  <div class="max-w-4xl mx-auto">
+  <div class="max-w-6xl mx-auto">
     <!-- Create Paste Section -->
     <div
       class="bg-slate-800/50 rounded-3xl shadow-2xl p-8 mb-16 border border-slate-700/50 backdrop-blur-sm"

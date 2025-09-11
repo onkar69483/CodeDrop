@@ -200,7 +200,7 @@
                 </span>
             </h2>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                 {#each data.contributors as contributor}
                     <a
                         href="https://github.com/{contributor.githubId}"
