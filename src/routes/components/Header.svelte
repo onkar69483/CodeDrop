@@ -47,7 +47,7 @@
 </script>
 
 <header 
-    class="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md {isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} {isScrolled ? 'bg-gray-900/95 shadow-xl' : 'bg-transparent'}"
+    class="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md {isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} {isScrolled ? 'bg-gray-900/80 shadow-xl border-b border-gray-700/50' : 'bg-gray-900/60'}"
 >
     <div class="container mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
@@ -56,7 +56,7 @@
                 href="/" 
                 class="relative group"
             >
-                <span class="text-3xl font-bold text-white tracking-wide transition-colors duration-300 group-hover:text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500" 
+                <span class="text-3xl font-bold text-white tracking-wide transition-colors duration-300 group-hover:text-gray-200" 
                       style="font-family: 'Dancing Script', cursive;">
                 CodeDrop
                 </span>
