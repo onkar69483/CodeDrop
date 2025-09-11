@@ -207,6 +207,16 @@ body {
 	box-shadow: 0 0 30px rgba(96, 165, 250, 0.5);
 }
 
+/* Subtle focus effects */
+.subtle-focus {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.subtle-focus:focus {
+  border-color: #6b7280;
+  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1);
+}
+
 @font-face {
 	font-family: 'icomoon';
 	src: url('/fonts/icomoon.eot?mpuld7');

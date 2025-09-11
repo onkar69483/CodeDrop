@@ -9,6 +9,8 @@
   import { goto } from "$app/navigation";
   import { fade, slide, scale } from "svelte/transition";
   import { quintOut } from "svelte/easing";
+  import { Clock } from 'lucide-svelte';
+  import { onDestroy } from "svelte";
 
   let id = null;
   let paste = null;
@@ -17,6 +19,8 @@
   let showSuccessToast = false;
   let toastMessage = "";
   let isLoading = true;
+  let currentTime = new Date();
+  let timeUpdateInterval;
   const doc = new jsPDF();
 
   function showToast(message) {
@@ -28,9 +32,34 @@
     }, 3000);
   }
 
+  // Reactive function to format expiration time with live updates
+  $: formatExpirationTime = (expirationDate) => {
+    if (!expirationDate) return 'Never expires';
+    
+    const expiry = new Date(expirationDate);
+    const timeDiff = expiry.getTime() - currentTime.getTime();
+    
+    if (timeDiff <= 0) return 'Expired';
+    
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+    
+    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+    if (minutes > 0) return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
+  };
+
   onMount(async () => {
     id = $page.params.id;
     console.log(`fetching /api?id=${id}`);
+
+    // Start live time updates
+    timeUpdateInterval = setInterval(() => {
+      currentTime = new Date();
+    }, 1000);
 
     try {
       const res = await fetch(`/api?id=${id}`);
@@ -50,24 +79,13 @@
     }
   });
 
-  // Function to format expiration time
-  function formatExpirationTime(expirationTimestamp) {
-    const secondsRemaining = Math.floor(
-      (expirationTimestamp - Date.now()) / 1000
-    );
-
-    if (secondsRemaining <= 0) {
-      return "Expired";
-    } else if (secondsRemaining < 60) {
-      return `${secondsRemaining} seconds`;
-    } else if (secondsRemaining < 3600) {
-      return `${Math.floor(secondsRemaining / 60)} minutes`;
-    } else if (secondsRemaining < 86400) {
-      return `${Math.floor(secondsRemaining / 3600)} hours`;
-    } else {
-      return `${Math.floor(secondsRemaining / 86400)} days`;
+  // Cleanup interval on component destroy
+  onDestroy(() => {
+    if (timeUpdateInterval) {
+      clearInterval(timeUpdateInterval);
     }
-  }
+  });
+
 
   async function shareLink() {
     if (navigator.share) {
@@ -126,7 +144,7 @@
 {/if}
 
 {#if errorMessage}
-  <div class="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex justify-center items-center px-4" transition:fade={{ duration: 400 }}>
+  <div class="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex justify-center items-center px-4 pt-24" transition:fade={{ duration: 400 }}>
     <div class="max-w-lg w-full mx-auto bg-gradient-to-br from-red-900/80 to-red-800/80 backdrop-blur-xl text-white rounded-2xl shadow-2xl p-8 border border-red-500/30" transition:scale={{ duration: 400, start: 0.9 }}>
       <div class="flex items-center space-x-4 mb-6">
         <div class="flex-shrink-0 w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
@@ -153,11 +171,11 @@
     </div>
   </div>
 {:else if paste}
-  <div class="min-h-screen bg-gradient-to-b from-gray-900/80 to-gray-800/80 text-white px-4 py-8 md:px-6" transition:fade={{ duration: 400 }}>
+  <div class="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white px-4 pt-24 pb-8 md:px-6" transition:fade={{ duration: 400 }}>
     <div class="max-w-6xl mx-auto">
       <!-- Header Section -->
       <div class="mb-8" transition:slide={{ duration: 400, delay: 100 }}>
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
           <button
             on:click={() => goto("/")}
             class="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors duration-200 group"
@@ -166,15 +184,51 @@
             <span>Back to Home</span>
           </button>
           
-          <div class="flex items-center space-x-2">
-            <span class="px-3 py-1 bg-blue-500/20 text-blue-400 text-sm rounded-full border border-blue-500/30">
-              📋 Code Snippet
-            </span>
-            {#if paste.paste_expiration}
-              <span class="px-3 py-1 bg-orange-500/20 text-orange-400 text-sm rounded-full border border-orange-500/30">
-                ⏳ {formatExpirationTime(paste.paste_expiration)}
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div class="flex items-center space-x-2">
+              <span class="px-3 py-1 bg-blue-500/20 text-blue-400 text-sm rounded-full border border-blue-500/30">
+                📋 Code Snippet
               </span>
-            {/if}
+              {#if paste.paste_expiration}
+                <span class="px-3 py-1 bg-orange-500/20 text-orange-400 text-sm rounded-full border border-orange-500/30 flex items-center space-x-1">
+                  <Clock class="w-3 h-3" />
+                  <span>{formatExpirationTime(paste.paste_expiration)}</span>
+                </span>
+              {/if}
+            </div>
+            
+            <!-- Action Buttons moved to top -->
+            <div class="flex flex-wrap gap-2">
+              <button
+                on:click={copyToClipboard}
+                class="flex items-center space-x-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-white text-sm rounded-lg transition-all transform hover:scale-105"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span>Copy</span>
+              </button>
+              
+              <button
+                on:click={downloadPDF}
+                class="flex items-center space-x-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-white text-sm rounded-lg transition-all transform hover:scale-105"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>PDF</span>
+              </button>
+              
+              <button
+                on:click={shareLink}
+                class="flex items-center space-x-2 px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-white text-sm rounded-lg transition-all transform hover:scale-105"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                </svg>
+                <span>Share</span>
+              </button>
+            </div>
           </div>
         </div>
         
@@ -215,43 +269,12 @@
         
         <!-- Code Content -->
         <div class="relative">
-          <div class="p-6 bg-gray-900 overflow-x-auto">
-            <HighlightAuto code={paste.text} />
+          <div class="p-6 bg-slate-900 overflow-x-auto max-w-full">
+            <div class="overflow-x-auto">
+              <HighlightAuto code={paste.text} />
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="mt-8 flex flex-wrap gap-4 justify-center" transition:slide={{ duration: 400, delay: 300 }}>
-        <button
-          on:click={copyToClipboard}
-          class="flex items-center space-x-2 px-6 py-3 bg-gray-700/50 hover:bg-gray-600/50 text-white font-medium rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500/50"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-          <span>Copy Code</span>
-        </button>
-        
-        <button
-          on:click={downloadPDF}
-          class="flex items-center space-x-2 px-6 py-3 bg-gray-700/50 hover:bg-gray-600/50 text-white font-medium rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500/50"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span>Download PDF</span>
-        </button>
-        
-        <button
-          on:click={shareLink}
-          class="flex items-center space-x-2 px-6 py-3 bg-gray-700/50 hover:bg-gray-600/50 text-white font-medium rounded-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500/50"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-          </svg>
-          <span>Share</span>
-        </button>
       </div>
     </div>
   </div>
